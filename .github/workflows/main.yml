@@ -25,7 +25,13 @@ jobs:
           cd ./submission/
           mkdir NetID1_NetID2_dpgen
           cp -r ../src ./NetID1_NetID2_dpgen/
-          git commit -m Submission
-          git push
-          
+      - name: Committing files
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -m "Add changes" -a
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
         
