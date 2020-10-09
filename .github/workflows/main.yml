@@ -1,9 +1,6 @@
-# This is a basic workflow to help you get started with Actions
 
-name: CI
+name: submit
 
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the main branch
 on:
   workflow_dispatch:
     branches: [ main ]
@@ -28,8 +25,9 @@ jobs:
       - name: Run a multi-line script
         shell: bash
         run: |
+          echo $PWD
           mkdir -p submission
           cd ./submission/
           mkdir NetID1_NetID2_dpgen
-          cp -r /src/ ./NetID1_NetID2_dpgen/
+          cp -r ../src/ ./NetID1_NetID2_dpgen/
         
