@@ -1,5 +1,5 @@
 //This must function properly according to description
-cd NetID1_NetID2_dpgen
+cd ${{ secrets.netids }}_dpgen
 mkdir build
 cd build
 cmake ..
