@@ -22,9 +22,11 @@ jobs:
         shell: bash
         run: |
           mkdir -p submission
+          git add submission
           cd ./submission/
           mkdir NetID1_NetID2_dpgen
           cp -r ../src ./NetID1_NetID2_dpgen/
+          git add *
       - name: Committing files
         run: |
           git config --local user.email "action@github.com"
