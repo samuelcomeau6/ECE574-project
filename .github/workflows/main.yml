@@ -21,7 +21,7 @@ jobs:
       - name: Create submission folder
         shell: bash
         run: |
-          apt install iverilog
+          sudo apt install iverilog
           mkdir -p submission
           git add submission
           cd ./submission/
