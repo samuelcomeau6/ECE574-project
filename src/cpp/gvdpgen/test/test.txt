@@ -1,0 +1,42 @@
+some
+silly
+words
+okay?
+474a_circuit1.txt
+A
+N
+Type
+Text
+Size
+178 bytes
+Storage used
+178 bytes
+Location
+assignment_2_circuits
+Owner
+me
+Modified
+Oct 9, 2020 by me
+Opened
+9:24 AM by me
+Created
+Oct 9, 2020 with Google Drive Web
+Add a description
+Viewers can download
+
+input Int8 a, b, c
+
+output Int8 z
+output Int16 x
+
+wire Int8 d, e
+wire Int16 f, g
+wire Int16 xwire
+
+d = a + b
+e = a + c
+g = d > e
+z = g ? d : e
+f = a * c
+xwire = f - d  
+x = xwire

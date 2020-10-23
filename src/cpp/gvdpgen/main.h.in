@@ -1,0 +1,2 @@
+#define VERSION_MAJOR @gvdpgen_VERSION_MAJOR@
+#define VERSION_MINOR @gvdpgen_VERSION_MINOR@
