@@ -5,7 +5,7 @@
 #ifndef PARSE_H
 #define PARSE_H 0
 namespace parse{
-    enum comp_t {REG, ADD, SUB, MUL, COMPLT, COMPEQ, COMPGT, COMPLTE, COMPGTE,
+    enum comp_t {ERR, REG, ADD, SUB, MUL, COMPLT, COMPEQ, COMPGT, COMPLTE, COMPGTE,
                  MUX2X1, SHR, SHL, DIV, MOD, INC, DEC, INPUT, OUTPUT, WIRE};
     void parse(std::string filename);
     std::ifstream open_netlist(std::string filename);

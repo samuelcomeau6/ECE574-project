@@ -97,24 +97,39 @@ namespace parse{
                 }
             }
        }
-       //Check for binary operators
+       //Check for character binary operators
        std::regex biop_regex("(\\w+)\\W*=\\W*(\\w+)\\W*"
-                           "(\\+|-|\\*|\\/|%|<<|>>|<|==|>|<=|>=)\\W*(\\w+)\\W*",
+                           "([\\+\\-\\*\\/%<>]+|==)\\W*(\\w+)\\W*",
                            std::regex_constants::ECMAScript);
+       std::regex biop_shift_regex("(\\w+)\\W*=\\W*(\\w+)\\W*"
+                           "(<<|>>|<=|>=)\\W*(\\w+)\\W*",
+                           std::regex_constants::ECMAScript);
+       std::smatch shift_matches;
        if(std::regex_search(line, matches, biop_regex)){
+            component=ERR;
             if(matches[3]=="+") component=ADD;
             if(matches[3]=="-") component=SUB;
             if(matches[3]=="*") component=MUL;
             if(matches[3]=="/") component=DIV;
             if(matches[3]=="%") component=MOD;
-            if(matches[3]=="<<") component=SHL;
-            if(matches[3]==">>") component=SHR;
-            if(matches[3]=="<") component=COMPLT;
+            if(matches[3]=="<") {
+                if(std::regex_search(line, shift_matches, biop_shift_regex)) {
+                    if(shift_matches[3]=="<<") component=SHL;
+                    if(shift_matches[3]=="<=") component=COMPLTE;
+                    matches = shift_matches;
+                }
+                else component=COMPLT;
+            }
+            if(matches[3]==">") {
+                if(std::regex_search(line, shift_matches, biop_shift_regex)){
+                    if(shift_matches[3]==">>") component=SHR;
+                    if(shift_matches[3]==">=") component=COMPGTE;
+                    matches = shift_matches;
+                 }
+                else  component=COMPGT;
+            }
             if(matches[3]=="==") component=COMPEQ;
-            if(matches[3]==">") component=COMPGT;
-            if(matches[3]=="<=") component=COMPLTE;
-            if(matches[3]==">=") component=COMPGTE;
-            path::add_op(component, matches[2], matches[4], matches[1]);
+            if(component!=ERR) path::add_op(component, matches[2], matches[4], matches[1]);
        }
        //Check for ternary operator
        std::regex triop_regex("(\\w+)\\W*=\\W*(\\w+)\\W*"
@@ -123,7 +138,8 @@ namespace parse{
        if(std::regex_search(line, matches, triop_regex)){
             path::add_mux(matches[2],matches[3],matches[4],matches[1]);
        }
-       std::regex noop_regex("(\\w+)\\W*=\\W*(\\w+)\\W*$",
+       //Check for assignment
+       std::regex noop_regex("(\\w+)\\s*=\\s*(\\w+)\\s*$",
                              std::regex_constants::ECMAScript);
        if(std::regex_search(line, matches, noop_regex)){
             path::add_assignment(matches[1], matches[2]);
@@ -146,7 +162,9 @@ namespace parse{
         std::string out;
         while(!netlist.eof()){
             out = parse_line(get_line(&netlist));
-            //std::cout << out << std::endl;
+            #ifdef DEBUG
+                std::cout << out << std::endl;
+            #endif
         };
         close(&netlist);
     }
