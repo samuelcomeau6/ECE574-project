@@ -98,38 +98,26 @@ namespace parse{
             }
        }
        //Check for character binary operators
-       std::regex biop_regex("(\\w+)\\W*=\\W*(\\w+)\\W*"
-                           "([\\+\\-\\*\\/%<>]+|==)\\W*(\\w+)\\W*",
+       std::regex biop_regex("(\\S+)\\W*=\\W*(\\S+)\\s*"
+                           "(\\W[=><]?)\\s*(\\S+)\\W*$",
                            std::regex_constants::ECMAScript);
-       std::regex biop_shift_regex("(\\w+)\\W*=\\W*(\\w+)\\W*"
-                           "(<<|>>|<=|>=)\\W*(\\w+)\\W*",
-                           std::regex_constants::ECMAScript);
-       std::smatch shift_matches;
        if(std::regex_search(line, matches, biop_regex)){
             component=ERR;
+            //std::cout << "sign is " << matches[3] << std::endl;
             if(matches[3]=="+") component=ADD;
             if(matches[3]=="-") component=SUB;
             if(matches[3]=="*") component=MUL;
             if(matches[3]=="/") component=DIV;
             if(matches[3]=="%") component=MOD;
-            if(matches[3]=="<") {
-                if(std::regex_search(line, shift_matches, biop_shift_regex)) {
-                    if(shift_matches[3]=="<<") component=SHL;
-                    if(shift_matches[3]=="<=") component=COMPLTE;
-                    matches = shift_matches;
-                }
-                else component=COMPLT;
-            }
-            if(matches[3]==">") {
-                if(std::regex_search(line, shift_matches, biop_shift_regex)){
-                    if(shift_matches[3]==">>") component=SHR;
-                    if(shift_matches[3]==">=") component=COMPGTE;
-                    matches = shift_matches;
-                 }
-                else  component=COMPGT;
-            }
+            if(matches[3]=="<") component=COMPLT;
+            if(matches[3]=="<<") component=SHL;
+            if(matches[3]==">") component=COMPGT;
+            if(matches[3]==">>") component=SHR;
             if(matches[3]=="==") component=COMPEQ;
             if(component!=ERR) path::add_op(component, matches[2], matches[4], matches[1]);
+            else{
+                std::cout << "Error" <<endl;
+            }
        }
        //Check for ternary operator
        std::regex triop_regex("(\\w+)\\W*=\\W*(\\w+)\\W*"

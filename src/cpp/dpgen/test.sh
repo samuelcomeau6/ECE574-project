@@ -1,2 +1,4 @@
-./dpgen ./test/474a_circuit1.txt|diff --suppress-common-lines -y ./test/circuit1.out -
-./dpgen ./test/474a_circuit2.txt|diff --suppress-common-lines -y ./test/circuit2.out -
+for i in {1..3};do
+    echo "Testing circuit $i"
+    ./dpgen ./test/474a_circuit"$i".txt|diff --suppress-common-lines -sy ./test/circuit"$i"out.txt -
+done

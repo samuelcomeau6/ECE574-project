@@ -1,0 +1,50 @@
+New unsigned 16 bit INPUT named a
+New unsigned 16 bit INPUT named b
+New unsigned 16 bit INPUT named c
+New unsigned 16 bit INPUT named d
+New unsigned 16 bit INPUT named e
+New unsigned 16 bit INPUT named f
+New unsigned 16 bit INPUT named g
+New unsigned 16 bit INPUT named h
+input Int16 a, b, c, d, e, f, g, h
+New unsigned 8 bit INPUT named sa
+input Int8 sa
+
+New unsigned 16 bit OUTPUT named avg
+output Int16 avg
+
+New unsigned 32 bit WIRE named l00
+New unsigned 32 bit WIRE named l01
+New unsigned 32 bit WIRE named l02
+New unsigned 32 bit WIRE named l03
+New unsigned 32 bit WIRE named l10
+New unsigned 32 bit WIRE named l11
+New unsigned 32 bit WIRE named l2
+New unsigned 32 bit WIRE named l2div2
+New unsigned 32 bit WIRE named l2div4
+New unsigned 32 bit WIRE named l2div8
+wire Int32 l00, l01, l02, l03, l10, l11, l2, l2div2, l2div4, l2div8
+
+New unsigned 0 bit ADD with inputs a and b and output l00
+l00 = a + b
+New unsigned 0 bit ADD with inputs c and d and output l01
+l01 = c + d
+New unsigned 0 bit ADD with inputs e and f and output l02
+l02 = e + f
+New unsigned 0 bit ADD with inputs g and h and output l03
+l03 = g + h
+New unsigned 0 bit ADD with inputs l00 and l01 and output l10
+l10 = l00 + l01
+New unsigned 0 bit ADD with inputs l02 and l03 and output l11
+l11 = l02 + l03
+New unsigned 0 bit ADD with inputs l10 and l11 and output l2
+l2 = l10 + l11
+New unsigned 0 bit SHR with inputs l2 and sa and output l2div2
+l2div2 = l2 >> sa
+New unsigned 0 bit SHR with inputs l2div2 and sa and output l2div4
+l2div4 = l2div2 >> sa 
+New unsigned 0 bit SHR with inputs l2div4 and sa and output l2div8
+l2div8 = l2div4 >> sa
+Assign l2div8 to avg
+avg = l2div8
+
