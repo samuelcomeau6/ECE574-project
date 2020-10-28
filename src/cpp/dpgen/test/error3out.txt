@@ -1,7 +1,6 @@
 New signed 8 bit INPUT named a
 New signed 8 bit INPUT named b
-New signed 8 bit INPUT named c
-input Int8 a, b, c
+input Int8 a, b			//missing input
 
 New signed 8 bit OUTPUT named z
 output Int8 z
@@ -19,6 +18,7 @@ wire Int16 xwire
 
 New unsigned 0 bit ADD with inputs a and b and output d
 d = a + b
+Error
 New unsigned 0 bit ADD with inputs a and c and output e
 e = a + c
 New unsigned 0 bit COMP> with inputs d and e and output g

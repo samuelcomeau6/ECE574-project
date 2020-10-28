@@ -17,8 +17,8 @@ wire Int16 f, g
 New signed 16 bit WIRE named xwire
 wire Int16 xwire
 
-New unsigned 0 bit ADD with inputs a and b and output d
-d = a + b
+Error
+d = a $ b     //incorrect operator
 New unsigned 0 bit ADD with inputs a and c and output e
 e = a + c
 New unsigned 0 bit COMP> with inputs d and e and output g

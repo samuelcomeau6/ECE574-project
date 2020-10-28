@@ -1,0 +1,14 @@
+New signed 8 bit INPUT named a
+input Int8 a
+New unsigned 16 bit INPUT named b
+input UInt16 b
+New signed 32 bit OUTPUT named c
+output Int32 c
+
+New signed 32 bit WIRE named cwire
+wire Int32 cwire
+
+New unsigned 0 bit ADD with inputs a and b and output cwire
+cwire = a + b
+Assign cwire to c
+c = cwire

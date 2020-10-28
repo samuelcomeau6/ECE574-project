@@ -73,8 +73,8 @@ namespace parse{
     */
     std::string parse_line(string line){
         int data_width;
-        bool data_signed;
-        comp_t component;
+        bool data_signed=0;
+        comp_t component=ERR;
         //Check for data types
         std::regex data_regex("(input|output|register|wire)"
                                "\\W+?(Int|UInt)(\\d+)\\W+(\\w+)"
@@ -87,8 +87,8 @@ namespace parse{
             if(matches[1]=="register") component=REG;
             if(matches[1]=="wire") component=WIRE;
 
-            if(matches[2]=="Int") data_signed=0;
-            if(matches[2]=="Uint") data_signed=1;
+            if(matches[2]=="Int") data_signed=1;
+            if(matches[2]=="UInt") data_signed=0;
             data_width = stoi(matches[3]);
 
             for (size_t i = 4; i < matches.size(); ++i){

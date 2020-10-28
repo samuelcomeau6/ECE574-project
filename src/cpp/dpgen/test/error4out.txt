@@ -4,9 +4,7 @@ New signed 8 bit INPUT named c
 input Int8 a, b, c
 
 New signed 8 bit OUTPUT named z
-output Int8 z
-New signed 16 bit OUTPUT named x
-output Int16 x
+output Int8 z			//missing output
 
 New signed 8 bit WIRE named d
 New signed 8 bit WIRE named e
@@ -28,6 +26,7 @@ z = g ? d : e
 New unsigned 0 bit MUL with inputs a and c and output f
 f = a * c
 New unsigned 0 bit SUB with inputs f and d and output xwire
-xwire = f - d  
+xwire = f - d 
+Error 
 Assign xwire to x
 x = xwire

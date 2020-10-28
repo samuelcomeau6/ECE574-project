@@ -1,0 +1,14 @@
+New unsigned 32 bit INPUT named a
+input UInt32 a
+New unsigned 16 bit INPUT named b
+input UInt16 b
+New unsigned 8 bit OUTPUT named c
+output UInt8 c
+
+New unsigned 8 bit WIRE named cwire
+wire UInt8 cwire
+
+New unsigned 0 bit ADD with inputs a and b and output cwire
+cwire = a + b
+Assign cwire to c
+c = cwire

@@ -1,28 +1,28 @@
-New unsigned 16 bit INPUT named a
-New unsigned 16 bit INPUT named b
-New unsigned 16 bit INPUT named c
-New unsigned 16 bit INPUT named d
-New unsigned 16 bit INPUT named e
-New unsigned 16 bit INPUT named f
-New unsigned 16 bit INPUT named g
-New unsigned 16 bit INPUT named h
+New signed 16 bit INPUT named a
+New signed 16 bit INPUT named b
+New signed 16 bit INPUT named c
+New signed 16 bit INPUT named d
+New signed 16 bit INPUT named e
+New signed 16 bit INPUT named f
+New signed 16 bit INPUT named g
+New signed 16 bit INPUT named h
 input Int16 a, b, c, d, e, f, g, h
-New unsigned 8 bit INPUT named sa
+New signed 8 bit INPUT named sa
 input Int8 sa
 
-New unsigned 16 bit OUTPUT named avg
+New signed 16 bit OUTPUT named avg
 output Int16 avg
 
-New unsigned 32 bit WIRE named l00
-New unsigned 32 bit WIRE named l01
-New unsigned 32 bit WIRE named l02
-New unsigned 32 bit WIRE named l03
-New unsigned 32 bit WIRE named l10
-New unsigned 32 bit WIRE named l11
-New unsigned 32 bit WIRE named l2
-New unsigned 32 bit WIRE named l2div2
-New unsigned 32 bit WIRE named l2div4
-New unsigned 32 bit WIRE named l2div8
+New signed 32 bit WIRE named l00
+New signed 32 bit WIRE named l01
+New signed 32 bit WIRE named l02
+New signed 32 bit WIRE named l03
+New signed 32 bit WIRE named l10
+New signed 32 bit WIRE named l11
+New signed 32 bit WIRE named l2
+New signed 32 bit WIRE named l2div2
+New signed 32 bit WIRE named l2div4
+New signed 32 bit WIRE named l2div8
 wire Int32 l00, l01, l02, l03, l10, l11, l2, l2div2, l2div4, l2div8
 
 New unsigned 0 bit ADD with inputs a and b and output l00

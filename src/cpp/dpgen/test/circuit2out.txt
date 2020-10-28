@@ -1,23 +1,23 @@
-New unsigned 32 bit INPUT named a
-New unsigned 32 bit INPUT named b
-New unsigned 32 bit INPUT named c
+New signed 32 bit INPUT named a
+New signed 32 bit INPUT named b
+New signed 32 bit INPUT named c
 input Int32 a, b, c
 
-New unsigned 32 bit OUTPUT named z
-New unsigned 32 bit OUTPUT named x
+New signed 32 bit OUTPUT named z
+New signed 32 bit OUTPUT named x
 output Int32 z, x
 
-New unsigned 32 bit WIRE named d
-New unsigned 32 bit WIRE named e
-New unsigned 32 bit WIRE named f
-New unsigned 32 bit WIRE named g
-New unsigned 32 bit WIRE named h
+New signed 32 bit WIRE named d
+New signed 32 bit WIRE named e
+New signed 32 bit WIRE named f
+New signed 32 bit WIRE named g
+New signed 32 bit WIRE named h
 wire Int32 d, e, f, g, h
-New unsigned 1 bit WIRE named dLTe
-New unsigned 1 bit WIRE named dEQe
+New signed 1 bit WIRE named dLTe
+New signed 1 bit WIRE named dEQe
 wire Int1 dLTe, dEQe  
-New unsigned 32 bit WIRE named zwire
-New unsigned 32 bit WIRE named xwire
+New signed 32 bit WIRE named zwire
+New signed 32 bit WIRE named xwire
 wire Int32 zwire, xwire
 
 New unsigned 0 bit ADD with inputs a and b and output d

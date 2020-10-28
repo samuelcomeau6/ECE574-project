@@ -10,6 +10,7 @@ namespace path{
         else output = output + "unsigned ";
         output = output + std::to_string(data_width) + " bit ";
         switch(component){
+             case parse::ERR: output = output + "ERROR"; break;
              case parse::REG: output = output + "REG"; break;
              case parse::ADD: output = output + "ADD"; break;
              case parse::SUB: output = output + "SUB"; break;
