@@ -1,4 +1,8 @@
 #include <string>
+#include "data_list.h"
+
+
+extern data_list d_list;
 
 namespace path{
     std::string component_to_string(int data_width, bool data_signed, parse::comp_t component);
