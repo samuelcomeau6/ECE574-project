@@ -18,6 +18,8 @@ typedef struct
 	bool  is_signed;
 	bool  is_assignment;
 	int   width;
+	float duration;
+	char* color;
 
 } data_type;
 
