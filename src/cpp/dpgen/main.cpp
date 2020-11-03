@@ -1,5 +1,5 @@
 
-
+#include <cstring>
 #include "parse.h"
 #include "path.h"
 
@@ -112,7 +112,9 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 			}
 			else if (strncmp(delimit, "BEGIN_INPUT", strlen("BEGIN_INPUT")) == 0)
 			{
-				printf("list count:%d\n", d_list.count);
+				#ifdef DEBUG
+				    printf("input list count:%d\n", d_list.count);
+			    #endif
 				for (int i = 0; i < d_list.count; i++)
 				{
 					if (!d_list.data_v[i].is_input)
@@ -130,7 +132,9 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 			{
 				int count = 0;
 				int total_count = 0;
-				printf("list count:%d\n", d_list.count);
+                #ifdef DEBUG
+    				printf("output list count:%d\n", d_list.count);
+				#endif
 				for (int i = 0; i < d_list.count; i++)
 				{
 					if (d_list.data_v[i].is_output)
@@ -152,7 +156,9 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 			}
 			else if (strncmp(delimit, "BEGIN_LOGIC", strlen("BEGIN_LOGIC")) == 0)
 			{
-				printf("list count:%d\n", d_list.count);
+			    #ifdef DEBUG
+    				printf("logic list count:%d\n", d_list.count);
+				#endif
 
 				for (int i = 0; i < d_list.count; i++)
 				{

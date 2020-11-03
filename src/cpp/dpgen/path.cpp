@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 #include <string>
 #include "parse.h"
 #include "path.h"
@@ -64,9 +65,11 @@ namespace path{
     }
 
     void add_data(parse::comp_t component_type, std::string name, int data_width, bool is_signed){
-        std::cout << "New DATA  ";
-        std::cout << component_to_string(data_width, is_signed, component_type);
-        std::cout << " named " << name << std::endl;
+        #ifdef DEBUG
+            std::cout << "New DATA  ";
+            std::cout << component_to_string(data_width, is_signed, component_type);
+            std::cout << " named " << name << std::endl;
+        #endif
 
         data_type temp_obj;
         temp_obj.input_1_name = new char[name.size() + 1];
@@ -90,10 +93,12 @@ namespace path{
     void add_op(parse::comp_t component_type, std::string input1, std::string input2, std::string output){
         bool is_signed = 0;
         int data_width = 0;
-        std::cout << "New OP  ";
-        std::cout << component_to_string(data_width, is_signed, component_type);
-        std::cout << " with inputs " << input1 << " and " << input2;
-        std::cout << " and output " << output << std::endl;
+        #ifdef DEBUG
+            std::cout << "New OP  ";
+            std::cout << component_to_string(data_width, is_signed, component_type);
+            std::cout << " with inputs " << input1 << " and " << input2;
+            std::cout << " and output " << output << std::endl;
+        #endif
 
         data_type temp_obj;
         temp_obj.input_1_name = new char[input1.size() + 1];
@@ -118,11 +123,13 @@ namespace path{
         d_list.data_v.push_back(temp_obj);
     }
     void add_mux(std::string input, std::string is_true, std::string is_false, std::string output){
-        std::cout << "New ";
-        std::cout << "MUX";
-        std::cout << " with input " << input << " with options ";
-        std::cout << is_true << " if true and " << is_false << " if false";
-        std::cout << " and output " << output << std::endl;
+        #ifdef DEBUG
+            std::cout << "New ";
+            std::cout << "MUX";
+            std::cout << " with input " << input << " with options ";
+            std::cout << is_true << " if true and " << is_false << " if false";
+            std::cout << " and output " << output << std::endl;
+        #endif
 
         data_type temp_obj;
         temp_obj.input_1_name = new char[is_true.size() + 1];
@@ -145,8 +152,9 @@ namespace path{
         d_list.data_v.push_back(temp_obj);
     }
     void add_assignment(std::string left, std::string right){
-        std::cout << "Assign " << right << " to " << left << std::endl;
-
+        #ifdef DEBUG
+            std::cout << "Assign " << right << " to " << left << std::endl;
+        #endif
         data_type temp_obj;
         temp_obj.output_name = new char[left.size() + 1];
         temp_obj.input_1_name = new char[right.size() + 1];
