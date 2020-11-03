@@ -25,7 +25,7 @@ module mcircuit3(
 
 	 wire [7:0] cwire;
 	 ADD #(8) s_ADD4 (a,b,cwire);
-     REG #(8) s_REG (cwire,clk,rst,c);
+	 REG #(8) s_REG (cwire,clk,rst,c);
 
 
 endmodule

@@ -39,12 +39,12 @@ module circuit4(
 	 SUB #(64) u_SUB18 (a,b,f);
 	 COMP #(64) u_COMP19 (d,e,.eq(dEQe));
 	 COMP #(64) u_COMP20 (d,e,.lt(dLTe));
-     REG #(64) u_REG21 (g,clk,rst,greg);
-     REG #(64) u_REG22 (h,clk,rst,hreg);
+	 REG #(64) u_REG21 (g,clk,rst,greg);
+	 REG #(64) u_REG22 (h,clk,rst,hreg);
 	 SHL #(0) u_SHL25 (hreg,dLTe,xrin);
 	 SHR #(0) u_SHR26 (greg,dEQe,zrin);
-     REG #(32) u_REG27 (xrin,clk,rst,x);
-     REG #(32) u_REG28 (zrin,clk,rst,z);
+	 REG #(32) u_REG27 (xrin,clk,rst,x);
+	 REG #(32) u_REG28 (zrin,clk,rst,z);
 
 
 endmodule

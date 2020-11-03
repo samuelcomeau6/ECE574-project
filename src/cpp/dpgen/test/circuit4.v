@@ -15,12 +15,12 @@
 
 module circuit4(
 
-	 input a,
-	 input b,
-	 input c,
+	 input [63:0] a,
+	 input [63:0] b,
+	 input [63:0] c,
 
-	 output z;
-	 output x
+	 output [31:0] z,
+	 output [31:0] x
 );
 
 	 wire [63:0] d;

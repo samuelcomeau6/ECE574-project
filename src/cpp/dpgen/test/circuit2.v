@@ -15,12 +15,12 @@
 
 module circuit2(
 
-	 input a,
-	 input b,
-	 input c,
+	 input [31:0] a,
+	 input [31:0] b,
+	 input [31:0] c,
 
-	 output z;
-	 output x
+	 output [31:0] z,
+	 output [31:0] x
 );
 
 	 wire [31:0] d;

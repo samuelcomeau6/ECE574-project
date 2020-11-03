@@ -15,11 +15,11 @@
 
 module error3(
 
-	 input a,
-	 input b,
+	 input [7:0] a,
+	 input [7:0] b,
 
-	 output z;
-	 output x
+	 output [7:0] z,
+	 output [15:0] x
 );
 
 	 wire [7:0] d;

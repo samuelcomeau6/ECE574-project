@@ -15,17 +15,17 @@
 
 module circuit3(
 
-	 input a,
-	 input b,
-	 input c,
-	 input d,
-	 input e,
-	 input f,
-	 input g,
-	 input h,
-	 input sa,
+	 input [15:0] a,
+	 input [15:0] b,
+	 input [15:0] c,
+	 input [15:0] d,
+	 input [15:0] e,
+	 input [15:0] f,
+	 input [15:0] g,
+	 input [15:0] h,
+	 input [7:0] sa,
 
-	 output avg
+	 output [15:0] avg
 );
 
 	 wire [31:0] l00;

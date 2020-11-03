@@ -35,7 +35,7 @@ module circuit5(
 	 DIV #(64) u_DIV12 (c,d,f);
 	 MOD #(64) u_MOD13 (a,b,g);
 	 COMP #(64) u_COMP14 (g,zero,.eq(gEQz));
-     REG #(64) u_REG15 (zwire,clk,rst,z);
+	 REG #(64) u_REG15 (zwire,clk,rst,z);
 
 
 endmodule

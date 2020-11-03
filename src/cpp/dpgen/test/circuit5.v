@@ -15,13 +15,13 @@
 
 module circuit5(
 
-	 input a,
-	 input b,
-	 input c,
-	 input d,
-	 input zero,
+	 input [63:0] a,
+	 input [63:0] b,
+	 input [63:0] c,
+	 input [63:0] d,
+	 input [63:0] zero,
 
-	 output z
+	 output [63:0] z
 );
 
 	 wire [63:0] e;

@@ -40,8 +40,8 @@ module circuit2(
 	 COMP #(32) s_COMP18 (d,e,.lt(dLTe));
 	 SHL #(32) s_SHL21 (g,dLTe,xwire);
 	 SHR #(32) s_SHR22 (h,dEQe,zwire);
-     REG #(32) s_REG (xwire,clk,rst,x);
-     REG #(32) s_REG (zwire,clk,rst,x);
+	 REG #(32) s_REG (xwire,clk,rst,x);
+	 REG #(32) s_REG (zwire,clk,rst,x);
 
 endmodule
 

@@ -15,12 +15,12 @@
 
 module circuit1(
 
-	 input a,
-	 input b,
-	 input c,
+	 input [7:0] a,
+	 input [7:0] b,
+	 input [7:0] c,
 
-	 output z;
-	 output x
+	 output [7:0] z,
+	 output [15:0] x
 );
 
 	 wire [7:0] d;

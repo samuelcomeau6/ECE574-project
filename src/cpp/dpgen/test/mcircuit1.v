@@ -15,10 +15,10 @@
 
 module mcircuit1(
 
-	 input a,
-	 input b,
+	 input [7:0] a,
+	 input [7:0] b,
 
-	 output c
+	 output [7:0] c
 );
 
 	 wire [7:0] cwire;

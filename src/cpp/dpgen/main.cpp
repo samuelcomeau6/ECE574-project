@@ -104,18 +104,24 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 			}
 			else if (strncmp(delimit, "BEGIN_INPUT", strlen("BEGIN_INPUT")) == 0)
 			{
+				int count = 0;
+				int total_count = 0;
 				#ifdef DEBUG
 				    printf("input list count:%d\n", d_list.count);
 			    #endif
 				for (int i = 0; i < d_list.count; i++)
 				{
+					if (d_list.data_v[i].is_input)
+						count++;
+				}
+				for (int i = 0; i < d_list.count; i++)
+				{
 					if (!d_list.data_v[i].is_input)
 						continue;
 
+					total_count++;
 					char* new_line = new char[81];
-					strcpy(new_line, "\t input ");
-					strcat(new_line, d_list.data_v[i].input_1_name);
-					strcat(new_line, ",\n");
+					sprintf(new_line, "\t input [%d:0] %s,\n", d_list.data_v[i].width - 1, d_list.data_v[i].input_1_name);
 					fputs(new_line, outputfp);
 				}
 				fputs("\n", outputfp);
@@ -139,10 +145,9 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 
 					total_count++;
 					char* new_line = new char[81];
-					strcpy(new_line, "\t output ");
-					strcat(new_line, d_list.data_v[i].input_1_name);
+					sprintf(new_line, "\t output [%d:0] %s", d_list.data_v[i].width - 1, d_list.data_v[i].input_1_name);
 					if (total_count != count)
-						strcat(new_line, ";\n");
+						strcat(new_line, ",\n");
 					fputs(new_line, outputfp);
 				}
 			}
@@ -176,6 +181,7 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 					else if (d_list.data_v[i].is_assignment)
 					{
 						char* new_line = new char[81];
+						//TODO this is not what an assignment operator does, it should set a register output
 						sprintf(new_line, "\t assign %s = %s;\n", d_list.data_v[i].output_name, d_list.data_v[i].input_1_name);
 						fputs(new_line, outputfp);
 					}

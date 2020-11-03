@@ -15,10 +15,10 @@
 
 module ucircuit3(
 
-	 input a,
-	 input b,
+	 input [31:0] a,
+	 input [15:0] b,
 
-	 output c
+	 output [7:0] c
 );
 
 	 wire [7:0] cwire;
