@@ -4,6 +4,7 @@ then
 else
     outfile=/dev/null
 fi
+echo > $outfile
 for i in {1..6};do
     echo "Testing circuit $i"
 #    rm ./test/circuit"$i".v
@@ -13,7 +14,7 @@ for i in {1..6};do
     then
         echo "Passed"
     else
-        echo "Failed"
+        echo "...FAILED!"
     fi
 done
 for i in {1..3};do
@@ -25,7 +26,7 @@ for i in {1..3};do
     then
         echo "Passed"
     else
-        echo "Failed"
+        echo "...FAILED!"
     fi
 done
 for i in {1..3};do
@@ -37,7 +38,7 @@ for i in {1..3};do
     then
         echo "Passed"
     else
-        echo "Failed"
+        echo "...FAILED!"
     fi
 done
 for i in {1..4};do
@@ -47,6 +48,6 @@ for i in {1..4};do
     then
         echo "Passed"
     else
-        echo "Failed"
+        echo "...FAILED!"
     fi
 done
