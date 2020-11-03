@@ -15,13 +15,15 @@
 
 module circuit5(
 
-	 input a,
-	 input b,
-	 input c,
-	 input d,
-	 input zero,
+	 input clk,
+	 input rst,
+	 input [63:0] a,
+	 input [63:0] b,
+	 input [63:0] c,
+	 input [63:0] d,
+	 input [63:0] zero,
 
-	 output z
+	 output [63:0] z
 );
 
 	 wire [63:0] e;
@@ -29,11 +31,11 @@ module circuit5(
 	 wire [63:0] g;
 	 wire [63:0] zwire;
 	 wire [0:0] gEQz;
-	 DIV #(0) u_DIV11 (a,b,e);
-	 DIV #(0) u_DIV12 (c,d,f);
-	 MOD #(0) u_MOD13 (a,b,g);
-	 COMP== #(0) u_COMP==14 (g,zero,gEQz);
-	 assign z = zwire;
+	 DIV #(64) u_DIV11 (a,b,e);
+	 DIV #(64) u_DIV12 (c,d,f);
+	 MOD #(64) u_MOD13 (a,b,g);
+	 COMP #(64) u_COMP14 (g,zero,.eq(gEQz));
+     REG #(64) u_REG15 (zwire,clk,rst,z);
 
 
 endmodule

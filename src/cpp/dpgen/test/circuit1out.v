@@ -14,13 +14,14 @@
 // *********************************************************************************
 
 module circuit1(
+	 input clk,
+	 input rst,
+	 input [7:0] a,
+	 input [7:0] b,
+	 input [7:0] c,
 
-	 input a,
-	 input b,
-	 input c,
-
-	 output z;
-	 output x
+	 output [7:0] z,
+	 output [15:0] x
 );
 
 	 wire [7:0] d;
@@ -28,12 +29,14 @@ module circuit1(
 	 wire [15:0] f;
 	 wire [15:0] g;
 	 wire [15:0] xwire;
-	 ADD #(0) u_ADD10 (a,b,d);
-	 ADD #(0) u_ADD11 (a,c,e);
-	 COMP> #(0) u_COMP>12 (d,e,g);
-	 MUL #(0) u_MUL14 (a,c,f);
-	 SUB #(0) u_SUB15 (f,d,xwire);
-	 assign x = xwire;
+	 ADD #(8) s_ADD10 (a,b,d);
+	 ADD #(8) s_ADD11 (a,c,e);
+	 COMP #(16) s_COMP12 (d,e,.gt(g));
+	 MUX2x1 #(8) s_MUX13 (d,e,g,z);
+	 MUL #(16) s_MUL14 (a,c,f);
+	 SUB #(16) s_SUB15 (f,d,xwire);
+	 REG #(16) s_REG16 (zwire,clk,rst,z);
+	 REG #(16) s_REG17 (xwire,clk,rst,x);
 
 
 endmodule

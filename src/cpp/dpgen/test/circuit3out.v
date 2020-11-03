@@ -15,17 +15,19 @@
 
 module circuit3(
 
-	 input a,
-	 input b,
-	 input c,
-	 input d,
-	 input e,
-	 input f,
-	 input g,
-	 input h,
-	 input sa,
+	 input clk,
+	 input rst,
+	 input [15:0] a,
+	 input  [15:0] b,
+	 input  [15:0] c,
+	 input  [15:0] d,
+	 input  [15:0] e,
+	 input  [15:0] f,
+	 input  [15:0] g,
+	 input  [15:0] h,
+	 input  [8:0] sa,
 
-	 output avg
+	 output [15:0] avg
 );
 
 	 wire [31:0] l00;
@@ -38,17 +40,17 @@ module circuit3(
 	 wire [31:0] l2div2;
 	 wire [31:0] l2div4;
 	 wire [31:0] l2div8;
-	 ADD #(0) u_ADD20 (a,b,l00);
-	 ADD #(0) u_ADD21 (c,d,l01);
-	 ADD #(0) u_ADD22 (e,f,l02);
-	 ADD #(0) u_ADD23 (g,h,l03);
-	 ADD #(0) u_ADD24 (l00,l01,l10);
-	 ADD #(0) u_ADD25 (l02,l03,l11);
-	 ADD #(0) u_ADD26 (l10,l11,l2);
-	 SHR #(0) u_SHR27 (l2,sa,l2div2);
-	 SHR #(0) u_SHR28 (l2div2,sa,l2div4);
-	 SHR #(0) u_SHR29 (l2div4,sa,l2div8);
-	 assign avg = l2div8;
+	 ADD #(32) s_ADD20 (a,b,l00);
+	 ADD #(32) s_ADD21 (c,d,l01);
+	 ADD #(32) s_ADD22 (e,f,l02);
+	 ADD #(32) s_ADD23 (g,h,l03);
+	 ADD #(32) s_ADD24 (l00,l01,l10);
+	 ADD #(32) s_ADD25 (l02,l03,l11);
+	 ADD #(32) s_ADD26 (l10,l11,l2);
+	 SHR #(32) s_SHR27 (l2,sa,l2div2);
+	 SHR #(32) s_SHR28 (l2div2,sa,l2div4);
+	 SHR #(32) s_SHR29 (l2div4,sa,l2div8);
+	 REG #(16) s_REG30 (l2div8,clk,rst,avg);
 
 
 endmodule

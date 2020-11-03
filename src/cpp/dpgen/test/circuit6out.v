@@ -15,12 +15,14 @@
 
 module circuit6(
 
-	 input a,
-	 input b,
-	 input c,
-	 input zero,
+	 input clk,
+	 input rst,
+	 input [63:0] a,
+	 input [63:0] b,
+	 input [63:0] c,
+	 input [63:0] zero,
 
-	 output z
+	 output [63:0] z
 );
 
 	 wire [63:0] e;
@@ -28,11 +30,11 @@ module circuit6(
 	 wire [63:0] g;
 	 wire [63:0] zwire;
 	 wire [0:0] gEQz;
-	 SUB #(0) u_SUB10 (a,1,e);
-	 ADD #(0) u_ADD11 (c,1,f);
-	 MOD #(0) u_MOD12 (a,c,g);
-	 COMP== #(0) u_COMP==13 (g,zero,gEQz);
-	 assign z = zwire;
+	 SUB #(64) u_DEC10 (a,e);
+	 ADD #(64) u_INC11 (c,f);
+	 MOD #(64) u_MOD12 (a,c,g);
+	 COMP #(64) u_COMP13 (g,zero,.eq(gEQz));
+	 REG #(64) u_REG14 (zwire,clk,rst,z);
 
 
 endmodule

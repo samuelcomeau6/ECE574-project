@@ -15,15 +15,17 @@
 
 module ucircuit2(
 
-	 input a,
-	 input b,
+	 input clk,
+	 input rst,
+	 input [7:0] a,
+	 input [15:0] b,
 
-	 output c
+	 output [31:0] c
 );
 
 	 wire [31:0] cwire;
-	 ADD #(0) u_ADD4 (a,b,cwire);
-	 assign c = cwire;
+	 ADD #(32) u_ADD4 (a,b,cwire);
+	 REG #(32) u_REG5 (cwire,clk,rst,c);
 
 
 endmodule

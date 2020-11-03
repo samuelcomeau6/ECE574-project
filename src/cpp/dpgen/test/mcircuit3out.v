@@ -15,15 +15,17 @@
 
 module mcircuit3(
 
-	 input a,
-	 input b,
+	 input clk,
+	 input rst,
+	 input [31:0] a,
+	 input [15:0] b,
 
-	 output c
+	 output [7:0] c
 );
 
 	 wire [7:0] cwire;
-	 ADD #(0) u_ADD4 (a,b,cwire);
-	 assign c = cwire;
+	 ADD #(8) s_ADD4 (a,b,cwire);
+     REG #(8) s_REG (cwire,clk,rst,c);
 
 
 endmodule
