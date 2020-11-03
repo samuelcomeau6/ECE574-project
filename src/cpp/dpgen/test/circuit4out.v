@@ -17,23 +17,23 @@ module circuit4(
 
 	 input clk,
 	 input rst,
-	 input [63:0] a,
-	 input [63:0] b,
-	 input [63:0] c,
+	 input signed [63:0] a,
+	 input signed [63:0] b,
+	 input signed [63:0] c,
 
-	 output [31:0] z;
-	 output [31:0] x
+	 output signed [31:0] z;
+	 output signed [31:0] x
 );
 
-	 wire [63:0] d;
-	 wire [63:0] e;
-	 wire [63:0] f;
-	 wire [63:0] g;
-	 wire [63:0] h;
+	 wire signed [63:0] d;
+	 wire signed [63:0] e;
+	 wire signed [63:0] f;
+	 wire signed [63:0] g;
+	 wire signed [63:0] h;
 	 wire [0:0] dLTe;
 	 wire [0:0] dEQe;
-	 wire [63:0] xrin;
-	 wire [63:0] zrin;
+	 wire signed [63:0] xrin;
+	 wire signed [63:0] zrin;
 	 ADD #(64) u_ADD16 (a,b,d);
 	 ADD #(64) u_ADD17 (a,c,e);
 	 SUB #(64) u_SUB18 (a,b,f);

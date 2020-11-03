@@ -17,13 +17,13 @@ module mcircuit1(
 
 	 input clk,
 	 input rst,
-	 input [7:0] a,
+	 input signed [7:0] a,
 	 input [7:0] b,
 
-	 output [7:0] c
+	 output signed [7:0] c
 );
 
-	 wire [7:0] cwire;
+	 wire signed [7:0] cwire;
 	 ADD #(8) s_ADD4 (a,b,cwire);
 	 REG #(8) s_REG5 (cwire,clk,rst,c);
 

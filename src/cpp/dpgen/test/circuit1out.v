@@ -14,21 +14,22 @@
 // *********************************************************************************
 
 module circuit1(
+
 	 input clk,
 	 input rst,
-	 input [7:0] a,
-	 input [7:0] b,
-	 input [7:0] c,
+	 input signed [7:0] a,
+	 input signed [7:0] b,
+	 input signed [7:0] c,
 
-	 output [7:0] z,
-	 output [15:0] x
+	 output signed [7:0] z,
+	 output signed [15:0] x
 );
 
-	 wire [7:0] d;
-	 wire [7:0] e;
-	 wire [15:0] f;
-	 wire [15:0] g;
-	 wire [15:0] xwire;
+	 wire signed [7:0] d;
+	 wire signed [7:0] e;
+	 wire signed [15:0] f;
+	 wire signed [15:0] g;
+	 wire signed [15:0] xwire;
 	 ADD #(8) s_ADD10 (a,b,d);
 	 ADD #(8) s_ADD11 (a,c,e);
 	 COMP #(16) s_COMP12 (d,e,.gt(g));

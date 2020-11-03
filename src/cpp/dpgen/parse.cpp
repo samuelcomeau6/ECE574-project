@@ -37,6 +37,7 @@
 #include <string>
 #include <vector>
 #include <regex>
+#include <stdlib.h>
 #include "parse.h"
 #include "path.h"
 
@@ -81,6 +82,7 @@ namespace parse{
                                TEN_WORD_REGEX,
                                std::regex_constants::ECMAScript);
         std::smatch matches;
+        std::smatch tmatches;
         if(std::regex_search(line, matches, data_regex)){
             if(matches[1]=="input") component=INPUT;
             if(matches[1]=="output") component=OUTPUT;
@@ -97,15 +99,23 @@ namespace parse{
                 }
             }
        }
-       //Check for character binary operators
-       std::regex biop_regex("(\\S+)\\W*=\\W*(\\S+)\\s*"
-                           "(\\W[=><]?)\\s*(\\S+)\\W*$",
+       //Check for binary operators
+       std::regex biop_regex("(\\w+)\\s*=\\s*(\\w+)\\s*"
+                           "([^a-zA-Z0-9_ \\t\\n\\r\\f][=><]?)\\s*(\\w+)\\s*",
                            std::regex_constants::ECMAScript);
        if(std::regex_search(line, matches, biop_regex)){
             component=ERR;
-            //std::cout << "sign is " << matches[3] << std::endl;
-            if(matches[3]=="+") component=ADD;
-            if(matches[3]=="-") component=SUB;
+            #ifdef DEBUG
+                std::cout << "sign is " << matches[3] << std::endl;
+            #endif
+            if(matches[3]=="+"){
+                if(matches[4]=="1") component=INC;
+                else component=ADD;
+            }
+            if(matches[3]=="-") {
+                if(matches[4]=="1") component=DEC;
+                else component=SUB;
+            }
             if(matches[3]=="*") component=MUL;
             if(matches[3]=="/") component=DIV;
             if(matches[3]=="%") component=MOD;
@@ -114,18 +124,20 @@ namespace parse{
             if(matches[3]==">") component=COMPGT;
             if(matches[3]==">>") component=SHR;
             if(matches[3]=="==") component=COMPEQ;
-            if(component!=ERR) path::add_op(component, matches[2], matches[4], matches[1]);
-            else{
-                std::cout << "Error" <<endl;
+            //Check for ternary operator
+            std::regex triop_regex("(\\w+)\\s*=\\s*(\\w+)\\s*"
+                                   "\\?\\s*(\\w+)\\s*:\\s*(\\w+)\\s*",
+                                   std::regex_constants::ECMAScript);
+            if(std::regex_search(line, tmatches, triop_regex)){
+                path::add_mux(tmatches[2],tmatches[3],tmatches[4],tmatches[1]);
+            } else {
+                if(component!=ERR) path::add_op(component, matches[2], matches[4], matches[1]);
+                else{
+                    std::cout << "Error" <<endl;
+                    exit(EXIT_FAILURE);
+                }
             }
-       }
-       //Check for ternary operator
-       std::regex triop_regex("(\\w+)\\W*=\\W*(\\w+)\\W*"
-                           "\\?\\W*(\\w+)\\W*:\\W*(\\w+)\\W*",
-                           std::regex_constants::ECMAScript);
-       if(std::regex_search(line, matches, triop_regex)){
-            path::add_mux(matches[2],matches[3],matches[4],matches[1]);
-       }
+        }
        //Check for assignment
        std::regex noop_regex("(\\w+)\\s*=\\s*(\\w+)\\s*$",
                              std::regex_constants::ECMAScript);

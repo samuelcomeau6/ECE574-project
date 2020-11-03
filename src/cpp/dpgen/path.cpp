@@ -66,7 +66,7 @@ namespace path{
 
     void add_data(parse::comp_t component_type, std::string name, int data_width, bool is_signed){
         #ifdef DEBUG
-            std::cout << "New DATA  ";
+            std::cout << "New DATA ";
             std::cout << component_to_string(data_width, is_signed, component_type);
             std::cout << " named " << name << std::endl;
         #endif
@@ -94,7 +94,7 @@ namespace path{
         bool is_signed = 0;
         int data_width = 0;
         #ifdef DEBUG
-            std::cout << "New OP  ";
+            std::cout << "New OP ";
             std::cout << component_to_string(data_width, is_signed, component_type);
             std::cout << " with inputs " << input1 << " and " << input2;
             std::cout << " and output " << output << std::endl;

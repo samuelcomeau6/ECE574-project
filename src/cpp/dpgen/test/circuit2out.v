@@ -14,25 +14,26 @@
 // *********************************************************************************
 
 module circuit2(
+
 	 input clk,
 	 input rst,
-	 input [31:0] a,
-	 input [31:0] b,
-	 input [31:0] c,
+	 input signed [31:0] a,
+	 input signed [31:0] b,
+	 input signed [31:0] c,
 
-	 output [31:0] z;
-	 output [31:0] x
+	 output signed [31:0] z;
+	 output signed [31:0] x
 );
 
-	 wire [31:0] d;
-	 wire [31:0] e;
-	 wire [31:0] f;
-	 wire [31:0] g;
-	 wire [31:0] h;
+	 wire signed [31:0] d;
+	 wire signed [31:0] e;
+	 wire signed [31:0] f;
+	 wire signed [31:0] g;
+	 wire signed [31:0] h;
 	 wire [0:0] dLTe;
 	 wire [0:0] dEQe;
-	 wire [31:0] zwire;
-	 wire [31:0] xwire;
+	 wire signed [31:0] zwire;
+	 wire signed [31:0] xwire;
 	 ADD #(32) s_ADD14 (a,b,d);
 	 ADD #(32) s_ADD15 (a,c,e);
 	 SUB #(32) s_SUB16 (a,b,f);

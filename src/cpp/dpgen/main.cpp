@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
 	strtok(temp_name, ".");
     strncpy(module_name, temp_name, 80);
 	#ifdef DEBUG
-	    printf("Module name:%s",module_name);
+	    printf("Module name:%s\n",module_name);
     #endif
 
 

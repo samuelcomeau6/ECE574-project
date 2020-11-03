@@ -17,29 +17,29 @@ module circuit3(
 
 	 input clk,
 	 input rst,
-	 input [15:0] a,
-	 input [15:0] b,
-	 input [15:0] c,
-	 input [15:0] d,
-	 input [15:0] e,
-	 input [15:0] f,
-	 input [15:0] g,
-	 input [15:0] h,
-	 input [7:0] sa,
+	 input signed [15:0] a,
+	 input signed [15:0] b,
+	 input signed [15:0] c,
+	 input signed [15:0] d,
+	 input signed [15:0] e,
+	 input signed [15:0] f,
+	 input signed [15:0] g,
+	 input signed [15:0] h,
+	 input signed [7:0] sa,
 
-	 output [15:0] avg
+	 output signed [15:0] avg
 );
 
-	 wire [31:0] l00;
-	 wire [31:0] l01;
-	 wire [31:0] l02;
-	 wire [31:0] l03;
-	 wire [31:0] l10;
-	 wire [31:0] l11;
-	 wire [31:0] l2;
-	 wire [31:0] l2div2;
-	 wire [31:0] l2div4;
-	 wire [31:0] l2div8;
+	 wire signed [31:0] l00;
+	 wire signed [31:0] l01;
+	 wire signed [31:0] l02;
+	 wire signed [31:0] l03;
+	 wire signed [31:0] l10;
+	 wire signed [31:0] l11;
+	 wire signed [31:0] l2;
+	 wire signed [31:0] l2div2;
+	 wire signed [31:0] l2div4;
+	 wire signed [31:0] l2div8;
 	 ADD #(32) s_ADD20 (a,b,l00);
 	 ADD #(32) s_ADD21 (c,d,l01);
 	 ADD #(32) s_ADD22 (e,f,l02);
