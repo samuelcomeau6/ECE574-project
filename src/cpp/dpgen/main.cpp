@@ -1,4 +1,4 @@
-
+#include <stdlib.h>
 #include <cstring>
 #include "parse.h"
 #include "path.h"
@@ -13,6 +13,7 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 int main(int argc, char* argv[])
 {
 	char temp_name[81];
+	char temp_name2[81];
 	char module_name[81];
 	char* ptr;
 
@@ -30,28 +31,19 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		printf("ERROR: Cannot open file %s.\n", argv[1]);
+		printf("ERROR: Cannot open input file %s.\n", argv[1]);
 		return 1;
 	}
 
-	//remove file extension/path from input filename
-	strcpy(temp_name, argv[1]);
-	ptr = strstr(temp_name, ".");
-	*ptr = 0;
-	for(int i = strlen(temp_name); i != 0; i--)
-	{
-		if ((temp_name[i] == '/') || (temp_name[i] == '\\'))
-		{
-			int y = 0;
-			do 
-			{
-				i++;
-				module_name[y] = temp_name[i];
-				y++;
-			}while (temp_name[i] != '\0');
-			break;
-		}
-	}
+	//remove file extension/path from output filename
+	strncpy(temp_name, argv[2],80);
+	ptr = temp_name;
+	strncpy(temp_name, basename(ptr),80);
+	strtok(temp_name, ".");
+    strncpy(module_name, temp_name, 80);
+	#ifdef DEBUG
+	    printf("Module name:%s",module_name);
+    #endif
 
 
 	parse::parse((std::string)argv[1]);
@@ -70,7 +62,7 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 	FILE* templatefp = fopen(template_file, "r");
 	if (!templatefp)
 	{
-		printf("ERROR2: Cannot open file %s.\n", template_file);
+		printf("ERROR2: Cannot open output file %s.\n", template_file);
 		return 1;
 	}
 
