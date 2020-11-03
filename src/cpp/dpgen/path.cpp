@@ -118,6 +118,8 @@ namespace path{
         temp_obj.is_signed = false;
         temp_obj.is_assignment = false;
         temp_obj.width = 0;
+        temp_obj.duration = 0;
+		temp_obj.color = "none";
 
         d_list.count++;
         d_list.data_v.push_back(temp_obj);
@@ -147,7 +149,9 @@ namespace path{
         temp_obj.is_signed = false;
         temp_obj.is_assignment = false;
         temp_obj.width = 0;
-
+        temp_obj.duration = 0;
+		temp_obj.color = "none";
+        
         d_list.count++;
         d_list.data_v.push_back(temp_obj);
     }
@@ -171,6 +175,8 @@ namespace path{
         temp_obj.is_signed = false;
         temp_obj.is_assignment = true;
         temp_obj.width = 0;
+        temp_obj.duration = 0;
+		temp_obj.color = "none";
 
         d_list.count++;
         d_list.data_v.push_back(temp_obj);
