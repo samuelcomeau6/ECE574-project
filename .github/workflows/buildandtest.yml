@@ -32,9 +32,9 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: test-report
-          path: testreport.txt
+          path: src/cpp/dpgen/testreport.txt
       - name: output report
         uses: actions/upload-artifact@v2
         with:
-          name: test-report
-          path: testresult.txt
+          name: test-result
+          path: src/cpp/dpgen/testresult.txt
