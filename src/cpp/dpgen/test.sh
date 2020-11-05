@@ -1,3 +1,4 @@
+fail=0
 if [ -n "$1" ]
 then
     outfile=$1
@@ -14,6 +15,7 @@ for i in {1..6};do
     then
         echo "Passed"
     else
+        fail=1
         echo "...FAILED!"
     fi
 done
@@ -26,6 +28,7 @@ for i in {1..3};do
     then
         echo "Passed"
     else
+        fail=1
         echo "...FAILED!"
     fi
 done
@@ -38,6 +41,7 @@ for i in {1..3};do
     then
         echo "Passed"
     else
+        fail=1
         echo "...FAILED!"
     fi
 done
@@ -48,6 +52,8 @@ for i in {1..4};do
     then
         echo "Passed"
     else
+        fail=1
         echo "...FAILED!"
     fi
 done
+exit $fail
