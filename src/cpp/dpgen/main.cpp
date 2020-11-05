@@ -1,4 +1,7 @@
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include <cstring>
 #include "parse.h"
 #include "path.h"
@@ -7,6 +10,7 @@
 
 data_list d_list;
 
+char * strip_path(char *);
 int create_v_file(const char* template_file, char* output_file, char* module_name);
 
 	
@@ -36,11 +40,9 @@ int main(int argc, char* argv[])
 	}
 
 	//remove file extension/path from output filename
-    strncpy(temp_name, argv[2],80);
-    ptr = temp_name;
-    strncpy(temp_name,basename(ptr),80);
-    strtok(temp_name, ".");
-    strncpy(module_name, temp_name, 80);
+    char * name = strip_path(argv[2]);
+    strncpy(module_name, name,81);
+    free(name);
 	#ifdef DEBUG
 	    printf("Module name:%s\n",module_name);
     #endif
@@ -410,4 +412,22 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 
 	fclose(outputfp);
 	return 0;
+}
+
+char* strip_path(char * path){
+    char * temp = (char*)malloc(sizeof(char)*strlen(path));
+    char * ptr = temp;
+    char * lastptr = ptr;
+    strcpy(temp,path);
+    ptr = strtok(temp,"/\\");
+    while(ptr!=NULL){
+        ptr = strtok(NULL,"/\\");
+        if(ptr!=NULL) lastptr=ptr;
+    }
+    ptr = lastptr;
+    strtok(ptr,".");
+    char * output = (char*)malloc(sizeof(char)*strlen(ptr));
+    strcpy(output, ptr);
+    free(temp);
+    return output;
 }
