@@ -34,6 +34,7 @@ module circuit6(
 	 SINC #(64) s_INC11 (c,f);
 	 SMOD #(64) s_MOD12 (a,c,g);
 	 SCOMP #(64) s_COMP13 (g,zero,.eq(gEQz));
+	 SMUX2x1 #(64) s_MUX2x114 (e,f,gEQz,zwire);
 	 SREG #(64) s_REG15 (zwire,clk,rst,z);
 
 

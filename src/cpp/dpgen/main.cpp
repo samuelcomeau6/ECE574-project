@@ -170,6 +170,7 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 				char* comp_op;
 				char* inc_op;
 				char* dec_op;
+				char* mux_op;
 				for (int i = 0; i < d_list.count; i++)
 				{
 					if (d_list.data_v[i].is_wire)
@@ -196,8 +197,6 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 							comp_op = strstr(d_list.data_v[i].operation_name, "COMP");
     						inc_op = strstr(d_list.data_v[i].operation_name, "INC");
 	    					dec_op = strstr(d_list.data_v[i].operation_name, "DEC");
-							mux_op = strstr(d_list.data_v[i].operation_name, "MUX");
-
 						    //Width is determined by the size of the outputs only unless comp
 						    //Sign is determined by the inputs only
 							if (!strcmp(d_list.data_v[i].input_1_name, d_list.data_v[y].input_1_name))
@@ -280,7 +279,6 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 						}
 						else
 						{
-						    if(mux_op) printf("Mux\n");
 							char* new_line = new char[81];
 							char* format_string = new char[81];
 							strncpy(format_string,"\t %s #(%d) u_%s%d (%s,%s,%s);\n",81);
@@ -297,6 +295,38 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 							fputs(new_line, outputfp);
 							delete[] new_line;
 						}
+					}
+					else if (d_list.data_v[i].is_mux){
+						int max_width = 0;
+						for (int y = 0; y < d_list.count; y++)
+						{
+						    //Width is only based on output size, not input
+							if (!strcmp(d_list.data_v[i].input_1_name, d_list.data_v[y].input_1_name));
+							{
+								if (d_list.data_v[y].is_signed)
+    							    d_list.data_v[i].is_signed = 1;
+							}
+							if (!strcmp(d_list.data_v[i].output_name, d_list.data_v[y].input_1_name))
+							{
+								if (d_list.data_v[y].width > max_width)
+									max_width = d_list.data_v[y].width;
+							}
+						}
+						
+						char* new_line = new char[81];
+					    char* format_string = new char[81];
+						strncpy(format_string,"\t MUX2x1 #(%d) u_MUX2x1%d (%s,%s,%s,%s);\n",81);
+						if(d_list.data_v[i].is_signed) strncpy(format_string, "\t SMUX2x1 #(%d) s_MUX2x1%d (%s,%s,%s,%s);\n", 81);
+						sprintf(new_line, format_string,
+							max_width,
+							i,
+							d_list.data_v[i].input_1_name,
+							d_list.data_v[i].input_2_name,
+							d_list.data_v[i].operation_name,
+							d_list.data_v[i].output_name
+						);
+						fputs(new_line, outputfp);
+						delete[] new_line;
 					}
 					else if (d_list.data_v[i].is_assignment)
 					{

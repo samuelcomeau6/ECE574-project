@@ -35,6 +35,7 @@ module circuit5(
 	 SDIV #(64) s_DIV12 (c,d,f);
 	 SMOD #(64) s_MOD13 (a,b,g);
 	 SCOMP #(64) s_COMP14 (g,zero,.eq(gEQz));
+	 SMUX2x1 #(64) s_MUX2x115 (e,f,gEQz,zwire);
 	 SREG #(64) s_REG16 (zwire,clk,rst,z);
 
 

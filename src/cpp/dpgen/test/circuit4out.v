@@ -39,6 +39,8 @@ module circuit4(
 	 SSUB #(64) s_SUB18 (a,b,f);
 	 SCOMP #(64) s_COMP19 (d,e,.eq(dEQe));
 	 SCOMP #(64) s_COMP20 (d,e,.lt(dLTe));
+	 SMUX2x1 #(64) s_MUX2x121 (d,e,dLTe,g);
+	 SMUX2x1 #(64) s_MUX2x122 (g,f,dEQe,h);
 	 SREG #(64) s_REG23 (g,clk,rst,greg);
 	 SREG #(64) s_REG24 (h,clk,rst,hreg);
 	 SSHL #(64) s_SHL25 (hreg,dLTe,xrin);

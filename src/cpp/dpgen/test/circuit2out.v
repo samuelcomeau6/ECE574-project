@@ -39,6 +39,8 @@ module circuit2(
 	 SSUB #(32) s_SUB16 (a,b,f);
 	 SCOMP #(32) s_COMP17 (d,e,.eq(dEQe));
 	 SCOMP #(32) s_COMP18 (d,e,.lt(dLTe));
+	 SMUX2x1 #(32) s_MUX2x119 (d,e,dLTe,g);
+	 SMUX2x1 #(32) s_MUX2x120 (g,f,dEQe,h);
 	 SSHL #(32) s_SHL21 (g,dLTe,xwire);
 	 SSHR #(32) s_SHR22 (h,dEQe,zwire);
 	 SREG #(32) s_REG23 (xwire,clk,rst,x);

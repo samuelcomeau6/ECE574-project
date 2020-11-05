@@ -50,7 +50,7 @@ namespace path{
         case parse::COMPGT:  output = "COMP>"; break;
         case parse::COMPLTE: output = "COMP<="; break;
         case parse::COMPGTE: output = "COMP>="; break;
-        case parse::MUX2X1:  output = "MUX2X1"; break;
+        case parse::MUX2X1:  output = "MUX2x1"; break;
         case parse::SHR:     output = "SHR"; break;
         case parse::SHL:     output = "SHL"; break;
         case parse::DIV:     output = "DIV"; break;
@@ -135,10 +135,12 @@ namespace path{
         data_type temp_obj;
         temp_obj.input_1_name = new char[is_true.size() + 1];
         temp_obj.input_2_name = new char[is_false.size() + 1];
+        temp_obj.output_name = new char[output.size() + 1];
+        temp_obj.operation_name = new char[input.size() + 1];
         strcpy(temp_obj.input_1_name, is_true.c_str());
         strcpy(temp_obj.input_2_name, is_false.c_str());
-        temp_obj.output_name = 0;
-        temp_obj.operation_name = 0;
+        strcpy(temp_obj.output_name, output.c_str());
+        strcpy(temp_obj.operation_name, input.c_str());
         temp_obj.is_input = false;
         temp_obj.is_output = false;
         temp_obj.is_operation = false;
