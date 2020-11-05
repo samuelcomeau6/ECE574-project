@@ -33,7 +33,7 @@ jobs:
         with:
           name: test-report
           path: src/cpp/dpgen/testreport.txt
-      - name: output report
+      - name: output result
         uses: actions/upload-artifact@v2
         with:
           name: test-result
