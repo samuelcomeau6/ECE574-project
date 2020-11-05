@@ -46,7 +46,7 @@ jobs:
       - name: Download a single artifact
         uses: actions/download-artifact@v2
         with:
-          name: dpgen
+          name: binary
           path: ./src/cpp/dpgen/dpgen
           
       - name: Test
