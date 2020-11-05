@@ -36,11 +36,9 @@ int main(int argc, char* argv[])
 	}
 
 	//remove file extension/path from output filename
-	strncpy(temp_name, argv[2],80);
-	ptr = temp_name;
-	strncpy(temp_name, basename(ptr),80);
-	strtok(temp_name, ".");
-    strncpy(module_name, temp_name, 80);
+	strcpy(module_name, argv[2]);
+	ptr = strstr(module_name, ".");
+	*ptr = 0;
 	#ifdef DEBUG
 	    printf("Module name:%s\n",module_name);
     #endif
@@ -100,6 +98,7 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 				new_line[length] = 0; // set null char
 				strcat(new_line, module_name);
 				fputs(new_line, outputfp);
+				delete[] new_line;
 
 			}
 			else if (strncmp(delimit, "BEGIN_INPUT", strlen("BEGIN_INPUT")) == 0)
@@ -121,8 +120,13 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 
 					total_count++;
 					char* new_line = new char[81];
-					sprintf(new_line, "\t input [%d:0] %s,\n", d_list.data_v[i].width - 1, d_list.data_v[i].input_1_name);
+					if(d_list.data_v[i].is_signed)
+						sprintf(new_line, "\t input signed [%d:0] %s,\n", d_list.data_v[i].width - 1, d_list.data_v[i].input_1_name);
+					else
+						sprintf(new_line, "\t input [%d:0] %s,\n", d_list.data_v[i].width - 1, d_list.data_v[i].input_1_name);
+
 					fputs(new_line, outputfp);
+					delete[] new_line;
 				}
 				fputs("\n", outputfp);
 			}
@@ -145,10 +149,15 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 
 					total_count++;
 					char* new_line = new char[81];
-					sprintf(new_line, "\t output [%d:0] %s", d_list.data_v[i].width - 1, d_list.data_v[i].input_1_name);
+					if (d_list.data_v[i].is_signed)
+						sprintf(new_line, "\t output signed [%d:0] %s", d_list.data_v[i].width - 1, d_list.data_v[i].input_1_name);
+					else
+						sprintf(new_line, "\t output [%d:0] %s", d_list.data_v[i].width - 1, d_list.data_v[i].input_1_name);
+
 					if (total_count != count)
 						strcat(new_line, ",\n");
 					fputs(new_line, outputfp);
+					delete[] new_line;
 				}
 			}
 			else if (strncmp(delimit, "BEGIN_LOGIC", strlen("BEGIN_LOGIC")) == 0)
@@ -156,34 +165,143 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 			    #ifdef DEBUG
     				printf("logic list count:%d\n", d_list.count);
 				#endif
-
+				char* comp_op;
+				char* inc_op;
+				char* dec_op;
 				for (int i = 0; i < d_list.count; i++)
 				{
 					if (d_list.data_v[i].is_wire)
 					{
 						char* new_line = new char[81];
-						sprintf(new_line, "\t wire [%d:0] %s;\n", d_list.data_v[i].width - 1, d_list.data_v[i].input_1_name);
+						if (d_list.data_v[i].is_signed && d_list.data_v[i].width>1)
+							sprintf(new_line, "\t wire signed [%d:0] %s;\n", d_list.data_v[i].width - 1, d_list.data_v[i].input_1_name);
+						else if (d_list.data_v[i].is_signed)
+							sprintf(new_line, "\t wire signed %s;\n", d_list.data_v[i].input_1_name);
+						else if (d_list.data_v[i].width > 1)
+							sprintf(new_line, "\t wire [%d:0] %s;\n", d_list.data_v[i].width - 1, d_list.data_v[i].input_1_name);
+						else
+							sprintf(new_line, "\t wire %s;\n", d_list.data_v[i].input_1_name);
+
 						fputs(new_line, outputfp);
+						delete[] new_line;
 					}
 					else if (d_list.data_v[i].is_operation)
 					{
-						char* new_line = new char[81];
-						sprintf(new_line, "\t %s #(0) u_%s%d (%s,%s,%s);\n",
-							d_list.data_v[i].operation_name,
-							d_list.data_v[i].operation_name,
-							i,
-							d_list.data_v[i].input_1_name,
-							d_list.data_v[i].input_2_name,
-							d_list.data_v[i].output_name
-						);
-						fputs(new_line, outputfp);
+						int max_width = 0;
+						// Search for maximum width
+						for (int y = 0; y < d_list.count; y++)
+						{
+							if (!strcmp(d_list.data_v[i].input_1_name, d_list.data_v[y].input_1_name))
+							{
+								if (d_list.data_v[y].width > max_width)
+									max_width = d_list.data_v[y].width;
+							}
+							if (!strcmp(d_list.data_v[i].input_2_name, d_list.data_v[y].input_1_name))
+							{
+								if (d_list.data_v[y].width > max_width)
+									max_width = d_list.data_v[y].width;
+							}
+							if (!strcmp(d_list.data_v[i].output_name, d_list.data_v[y].input_1_name))
+							{
+								if (d_list.data_v[y].width > max_width)
+									max_width = d_list.data_v[y].width;
+							}
+						}
+						comp_op = strstr(d_list.data_v[i].operation_name, "COMP");
+						inc_op = strstr(d_list.data_v[i].operation_name, "INC");
+						dec_op = strstr(d_list.data_v[i].operation_name, "DEC");
+
+						if(comp_op) // true if this is a compare OP
+						{
+							char op[] = "00";
+							//Find compare operation
+							if (strstr(comp_op, "=="))
+								strcpy(op, "eq");
+							if (strstr(comp_op, "<"))
+								strcpy(op, "lt");
+							if (strstr(comp_op, ">"))
+								strcpy(op, "gt");
+
+							char* new_line = new char[81];
+							sprintf(new_line, "\t COMP #(%d) u_COMP%d (%s,%s,.%s(%s));\n",
+								max_width,
+								i,
+								d_list.data_v[i].input_1_name,
+								d_list.data_v[i].input_2_name,
+								op,
+								d_list.data_v[i].output_name
+							);
+							fputs(new_line, outputfp);
+							delete[] new_line;
+
+						}
+						else if (inc_op) // true if this is a INC OP
+						{
+							char* new_line = new char[81];
+							sprintf(new_line, "\t INC #(%d) u_INC%d (%s,%s);\n",
+								max_width,
+								i,
+								d_list.data_v[i].input_1_name,
+								d_list.data_v[i].output_name
+							);
+							fputs(new_line, outputfp);
+							delete[] new_line;
+						}
+						else if (dec_op) // true if this is a INC OP
+						{
+							char* new_line = new char[81];
+							sprintf(new_line, "\t DEC #(%d) u_DEC%d (%s,%s);\n",
+								max_width,
+								i,
+								d_list.data_v[i].input_1_name,
+								d_list.data_v[i].output_name
+							);
+							fputs(new_line, outputfp);
+							delete[] new_line;
+						}
+						else
+						{
+							char* new_line = new char[81];
+							sprintf(new_line, "\t %s #(%d) u_%s%d (%s,%s,%s);\n",
+								d_list.data_v[i].operation_name,
+								max_width,
+								d_list.data_v[i].operation_name,
+								i,
+								d_list.data_v[i].input_1_name,
+								d_list.data_v[i].input_2_name,
+								d_list.data_v[i].output_name
+							);
+							fputs(new_line, outputfp);
+							delete[] new_line;
+						}
 					}
 					else if (d_list.data_v[i].is_assignment)
 					{
+						int max_width = 0;
+						// Search for maximum width
+						for (int y = 0; y < d_list.count; y++)
+						{
+							if (!strcmp(d_list.data_v[i].input_1_name, d_list.data_v[y].input_1_name))
+							{
+								if (d_list.data_v[y].width > max_width)
+									max_width = d_list.data_v[y].width;
+							}
+							if (!strcmp(d_list.data_v[i].output_name, d_list.data_v[y].input_1_name))
+							{
+								if (d_list.data_v[y].width > max_width)
+									max_width = d_list.data_v[y].width;
+							}
+						}
+
 						char* new_line = new char[81];
-						//TODO this is not what an assignment operator does, it should set a register output
-						sprintf(new_line, "\t assign %s = %s;\n", d_list.data_v[i].output_name, d_list.data_v[i].input_1_name);
+						sprintf(new_line, "\t REG #(%d) u_REG%d (%s,clk,rst,%s);\n",
+							max_width,
+							i,
+							d_list.data_v[i].input_1_name,
+							d_list.data_v[i].output_name
+						);
 						fputs(new_line, outputfp);
+						delete[] new_line;
 					}
 				}
 			}
