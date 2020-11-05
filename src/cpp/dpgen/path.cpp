@@ -181,4 +181,13 @@ namespace path{
         d_list.count++;
         d_list.data_v.push_back(temp_obj);
     }
+    void free_list(){
+        for(int i=0;i<d_list.count;++i){
+            delete[] d_list.data_v[i].output_name;
+            delete[] d_list.data_v[i].input_1_name;
+            delete[] d_list.data_v[i].input_2_name;
+            delete[] d_list.data_v[i].operation_name;
+        }
+        d_list.data_v.clear();
+    }
 }

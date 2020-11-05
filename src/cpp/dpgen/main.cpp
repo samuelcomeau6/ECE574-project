@@ -260,6 +260,7 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 							);
 							fputs(new_line, outputfp);
 							delete[] new_line;
+							delete[] format_string;
 
 						}
 						else if (inc_op) // true if this is a INC OP
@@ -276,6 +277,8 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 							);
 							fputs(new_line, outputfp);
 							delete[] new_line;
+							delete[] format_string;
+
 						}
 						else if (dec_op) // true if this is a DEC OP
 						{
@@ -291,6 +294,7 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 							);
 							fputs(new_line, outputfp);
 							delete[] new_line;
+							delete[] format_string;
 						}
 						else
 						{
@@ -309,6 +313,7 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 							);
 							fputs(new_line, outputfp);
 							delete[] new_line;
+							delete[] format_string;
 						}
 					}
 					else if (d_list.data_v[i].is_mux){
@@ -357,6 +362,7 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 						);
 						fputs(new_line, outputfp);
 						delete[] new_line;
+						delete[] format_string;
 					}
 					else if (d_list.data_v[i].is_assignment)
 					{
@@ -399,6 +405,7 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 						);
 						fputs(new_line, outputfp);
 						delete[] new_line;
+						delete[] format_string;
 					}
 				}
 			}
@@ -409,13 +416,14 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 		}
 
 	}
-
+    path::free_list();
 	fclose(outputfp);
+	fclose(templatefp);
 	return 0;
 }
 
 char* strip_path(char * path){
-    char * temp = (char*)malloc(sizeof(char)*strlen(path));
+    char * temp = (char*)malloc(sizeof(char)*(strlen(path)+1));
     char * ptr = temp;
     char * lastptr = ptr;
     strcpy(temp,path);
@@ -426,7 +434,7 @@ char* strip_path(char * path){
     }
     ptr = lastptr;
     strtok(ptr,".");
-    char * output = (char*)malloc(sizeof(char)*strlen(ptr));
+    char * output = (char*)malloc(sizeof(char)*(strlen(ptr)+1));
     strcpy(output, ptr);
     free(temp);
     return output;
