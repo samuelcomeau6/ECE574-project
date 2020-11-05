@@ -29,6 +29,8 @@ jobs:
          ./build.sh
          ./test.sh testreport.txt | tee testresult.txt
          status=${PIPESTATUS[0]}
+         echo $status
+         exit $status
          
       - name: output report
         uses: actions/upload-artifact@v2
@@ -40,5 +42,4 @@ jobs:
         with:
           name: test-result
           path: src/cpp/dpgen/testresult.txt
-      - name: exit
-        run: exit $status
+
