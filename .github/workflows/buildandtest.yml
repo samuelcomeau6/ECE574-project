@@ -31,7 +31,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: binary
-          path: src/cpp/dpgen
+          path: src/cpp/dpgen/dpgen
          
   test:
     # The type of runner that the job will run on
@@ -47,7 +47,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: binary
-          path: ./src/cpp/dpgen/dpgen
+          path: ./src/cpp/dpgen/
           
       - name: Test
         run: |
