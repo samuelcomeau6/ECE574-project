@@ -27,4 +27,14 @@ jobs:
         run: |
          cd ./src/cpp/dpgen/
          ./build.sh
-         ./test.sh
+         ./test.sh testreport.txt | tee testresult.txt
+      - name: output report
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-report
+          path: src/cpp/dpgen/testreport.txt
+      - name: output result
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-result
+          path: src/cpp/dpgen/testresult.txt
