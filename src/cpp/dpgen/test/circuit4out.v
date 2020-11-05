@@ -21,7 +21,7 @@ module circuit4(
 	 input signed [63:0] b,
 	 input signed [63:0] c,
 
-	 output signed [31:0] z;
+	 output signed [31:0] z,
 	 output signed [31:0] x
 );
 
@@ -30,21 +30,21 @@ module circuit4(
 	 wire signed [63:0] f;
 	 wire signed [63:0] g;
 	 wire signed [63:0] h;
-	 wire [0:0] dLTe;
-	 wire [0:0] dEQe;
+	 wire dLTe;
+	 wire dEQe;
 	 wire signed [63:0] xrin;
 	 wire signed [63:0] zrin;
-	 ADD #(64) u_ADD16 (a,b,d);
-	 ADD #(64) u_ADD17 (a,c,e);
-	 SUB #(64) u_SUB18 (a,b,f);
-	 COMP #(64) u_COMP19 (d,e,.eq(dEQe));
-	 COMP #(64) u_COMP20 (d,e,.lt(dLTe));
-	 REG #(64) u_REG21 (g,clk,rst,greg);
-	 REG #(64) u_REG22 (h,clk,rst,hreg);
-	 SHL #(0) u_SHL25 (hreg,dLTe,xrin);
-	 SHR #(0) u_SHR26 (greg,dEQe,zrin);
-	 REG #(32) u_REG27 (xrin,clk,rst,x);
-	 REG #(32) u_REG28 (zrin,clk,rst,z);
+	 SADD #(64) s_ADD16 (a,b,d);
+	 SADD #(64) s_ADD17 (a,c,e);
+	 SSUB #(64) s_SUB18 (a,b,f);
+	 SCOMP #(64) s_COMP19 (d,e,.eq(dEQe));
+	 SCOMP #(64) s_COMP20 (d,e,.lt(dLTe));
+	 SREG #(64) s_REG23 (g,clk,rst,greg);
+	 SREG #(64) s_REG24 (h,clk,rst,hreg);
+	 SSHL #(64) s_SHL25 (hreg,dLTe,xrin);
+	 SSHR #(64) s_SHR26 (greg,dEQe,zrin);
+	 SREG #(32) s_REG27 (xrin,clk,rst,x);
+	 SREG #(32) s_REG28 (zrin,clk,rst,z);
 
 
 endmodule

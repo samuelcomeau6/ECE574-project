@@ -36,9 +36,11 @@ int main(int argc, char* argv[])
 	}
 
 	//remove file extension/path from output filename
-	strcpy(module_name, argv[2]);
-	ptr = strstr(module_name, ".");
-	*ptr = 0;
+    strncpy(temp_name, argv[2],80);
+    ptr = temp_name;
+    strncpy(temp_name,basename(ptr),80);
+    strtok(temp_name, ".");
+    strncpy(module_name, temp_name, 80);
 	#ifdef DEBUG
 	    printf("Module name:%s\n",module_name);
     #endif
@@ -176,7 +178,7 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 						if (d_list.data_v[i].is_signed && d_list.data_v[i].width>1)
 							sprintf(new_line, "\t wire signed [%d:0] %s;\n", d_list.data_v[i].width - 1, d_list.data_v[i].input_1_name);
 						else if (d_list.data_v[i].is_signed)
-							sprintf(new_line, "\t wire signed %s;\n", d_list.data_v[i].input_1_name);
+							sprintf(new_line, "\t wire %s;\n", d_list.data_v[i].input_1_name);
 						else if (d_list.data_v[i].width > 1)
 							sprintf(new_line, "\t wire [%d:0] %s;\n", d_list.data_v[i].width - 1, d_list.data_v[i].input_1_name);
 						else
@@ -188,18 +190,29 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 					else if (d_list.data_v[i].is_operation)
 					{
 						int max_width = 0;
-						// Search for maximum width
+						// Search for maximum width and signed
 						for (int y = 0; y < d_list.count; y++)
 						{
+							comp_op = strstr(d_list.data_v[i].operation_name, "COMP");
+    						inc_op = strstr(d_list.data_v[i].operation_name, "INC");
+	    					dec_op = strstr(d_list.data_v[i].operation_name, "DEC");
+							mux_op = strstr(d_list.data_v[i].operation_name, "MUX");
+
+						    //Width is determined by the size of the outputs only unless comp
+						    //Sign is determined by the inputs only
 							if (!strcmp(d_list.data_v[i].input_1_name, d_list.data_v[y].input_1_name))
 							{
-								if (d_list.data_v[y].width > max_width)
+								if (d_list.data_v[y].width > max_width && comp_op)
 									max_width = d_list.data_v[y].width;
+								if (d_list.data_v[y].is_signed)
+								    d_list.data_v[i].is_signed = 1;
 							}
 							if (!strcmp(d_list.data_v[i].input_2_name, d_list.data_v[y].input_1_name))
 							{
-								if (d_list.data_v[y].width > max_width)
+								if (d_list.data_v[y].width > max_width && comp_op)
 									max_width = d_list.data_v[y].width;
+								if (d_list.data_v[y].is_signed)
+    							    d_list.data_v[i].is_signed = 1;
 							}
 							if (!strcmp(d_list.data_v[i].output_name, d_list.data_v[y].input_1_name))
 							{
@@ -207,9 +220,6 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 									max_width = d_list.data_v[y].width;
 							}
 						}
-						comp_op = strstr(d_list.data_v[i].operation_name, "COMP");
-						inc_op = strstr(d_list.data_v[i].operation_name, "INC");
-						dec_op = strstr(d_list.data_v[i].operation_name, "DEC");
 
 						if(comp_op) // true if this is a compare OP
 						{
@@ -223,7 +233,10 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 								strcpy(op, "gt");
 
 							char* new_line = new char[81];
-							sprintf(new_line, "\t COMP #(%d) u_COMP%d (%s,%s,.%s(%s));\n",
+							char* format_string = new char[81];
+							strncpy(format_string,"\t COMP #(%d) u_COMP%d (%s,%s,.%s(%s));\n",81);
+							if(d_list.data_v[i].is_signed) strncpy(format_string, "\t SCOMP #(%d) s_COMP%d (%s,%s,.%s(%s));\n", 81);
+							sprintf(new_line, format_string,
 								max_width,
 								i,
 								d_list.data_v[i].input_1_name,
@@ -238,7 +251,10 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 						else if (inc_op) // true if this is a INC OP
 						{
 							char* new_line = new char[81];
-							sprintf(new_line, "\t INC #(%d) u_INC%d (%s,%s);\n",
+							char* format_string = new char[81];
+							strncpy(format_string,"\t INC #(%d) u_INC%d (%s,%s);\n",81);
+							if(d_list.data_v[i].is_signed) strncpy(format_string, "\t SINC #(%d) s_INC%d (%s,%s);\n", 81);
+							sprintf(new_line, format_string,
 								max_width,
 								i,
 								d_list.data_v[i].input_1_name,
@@ -247,10 +263,13 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 							fputs(new_line, outputfp);
 							delete[] new_line;
 						}
-						else if (dec_op) // true if this is a INC OP
+						else if (dec_op) // true if this is a DEC OP
 						{
 							char* new_line = new char[81];
-							sprintf(new_line, "\t DEC #(%d) u_DEC%d (%s,%s);\n",
+							char* format_string = new char [81];
+							strncpy(format_string, "\t DEC #(%d) u_DEC%d (%s,%s);\n",80);
+							if(d_list.data_v[i].is_signed) strncpy(format_string, "\t SDEC #(%d) s_DEC%d (%s,%s);\n", 81);
+							sprintf(new_line, format_string,
 								max_width,
 								i,
 								d_list.data_v[i].input_1_name,
@@ -261,8 +280,12 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 						}
 						else
 						{
+						    if(mux_op) printf("Mux\n");
 							char* new_line = new char[81];
-							sprintf(new_line, "\t %s #(%d) u_%s%d (%s,%s,%s);\n",
+							char* format_string = new char[81];
+							strncpy(format_string,"\t %s #(%d) u_%s%d (%s,%s,%s);\n",81);
+							if(d_list.data_v[i].is_signed) strncpy(format_string, "\t S%s #(%d) s_%s%d (%s,%s,%s);\n", 81);
+							sprintf(new_line, format_string,
 								d_list.data_v[i].operation_name,
 								max_width,
 								d_list.data_v[i].operation_name,
@@ -278,13 +301,16 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 					else if (d_list.data_v[i].is_assignment)
 					{
 						int max_width = 0;
-						// Search for maximum width
+						// Search for maximum width and signed
 						for (int y = 0; y < d_list.count; y++)
 						{
+						    //Width is only based on output size, not input
 							if (!strcmp(d_list.data_v[i].input_1_name, d_list.data_v[y].input_1_name))
 							{
-								if (d_list.data_v[y].width > max_width)
-									max_width = d_list.data_v[y].width;
+								/*if (d_list.data_v[y].width > max_width)
+									max_width = d_list.data_v[y].width;*/
+								if (d_list.data_v[y].is_signed)
+    							    d_list.data_v[i].is_signed = 1;
 							}
 							if (!strcmp(d_list.data_v[i].output_name, d_list.data_v[y].input_1_name))
 							{
@@ -294,7 +320,10 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 						}
 
 						char* new_line = new char[81];
-						sprintf(new_line, "\t REG #(%d) u_REG%d (%s,clk,rst,%s);\n",
+						char* format_string = new char[81];
+						strncpy(format_string,"\t REG #(%d) u_REG%d (%s,clk,rst,%s);\n",81);
+						if(d_list.data_v[i].is_signed) strncpy(format_string, "\t SREG #(%d) s_REG%d (%s,clk,rst,%s);\n", 81);
+						sprintf(new_line, format_string,
 							max_width,
 							i,
 							d_list.data_v[i].input_1_name,

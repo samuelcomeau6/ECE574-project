@@ -30,12 +30,12 @@ module circuit5(
 	 wire signed [63:0] f;
 	 wire signed [63:0] g;
 	 wire signed [63:0] zwire;
-	 wire [0:0] gEQz;
-	 DIV #(64) u_DIV11 (a,b,e);
-	 DIV #(64) u_DIV12 (c,d,f);
-	 MOD #(64) u_MOD13 (a,b,g);
-	 COMP #(64) u_COMP14 (g,zero,.eq(gEQz));
-	 REG #(64) u_REG15 (zwire,clk,rst,z);
+	 wire gEQz;
+	 SDIV #(64) s_DIV11 (a,b,e);
+	 SDIV #(64) s_DIV12 (c,d,f);
+	 SMOD #(64) s_MOD13 (a,b,g);
+	 SCOMP #(64) s_COMP14 (g,zero,.eq(gEQz));
+	 SREG #(64) s_REG16 (zwire,clk,rst,z);
 
 
 endmodule

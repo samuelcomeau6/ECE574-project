@@ -40,17 +40,17 @@ module circuit3(
 	 wire signed [31:0] l2div2;
 	 wire signed [31:0] l2div4;
 	 wire signed [31:0] l2div8;
-	 ADD #(32) s_ADD20 (a,b,l00);
-	 ADD #(32) s_ADD21 (c,d,l01);
-	 ADD #(32) s_ADD22 (e,f,l02);
-	 ADD #(32) s_ADD23 (g,h,l03);
-	 ADD #(32) s_ADD24 (l00,l01,l10);
-	 ADD #(32) s_ADD25 (l02,l03,l11);
-	 ADD #(32) s_ADD26 (l10,l11,l2);
-	 SHR #(32) s_SHR27 (l2,sa,l2div2);
-	 SHR #(32) s_SHR28 (l2div2,sa,l2div4);
-	 SHR #(32) s_SHR29 (l2div4,sa,l2div8);
-	 REG #(16) s_REG30 (l2div8,clk,rst,avg);
+	 SADD #(32) s_ADD20 (a,b,l00);
+	 SADD #(32) s_ADD21 (c,d,l01);
+	 SADD #(32) s_ADD22 (e,f,l02);
+	 SADD #(32) s_ADD23 (g,h,l03);
+	 SADD #(32) s_ADD24 (l00,l01,l10);
+	 SADD #(32) s_ADD25 (l02,l03,l11);
+	 SADD #(32) s_ADD26 (l10,l11,l2);
+	 SSHR #(32) s_SHR27 (l2,sa,l2div2);
+	 SSHR #(32) s_SHR28 (l2div2,sa,l2div4);
+	 SSHR #(32) s_SHR29 (l2div4,sa,l2div8);
+	 SREG #(16) s_REG30 (l2div8,clk,rst,avg);
 
 
 endmodule

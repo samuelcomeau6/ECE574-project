@@ -30,11 +30,11 @@ module circuit6(
 	 wire signed [63:0] g;
 	 wire signed [63:0] zwire;
 	 wire gEQz;
-	 DEC #(64) u_DEC10 (a,e);
-	 INC #(64) u_INC11 (c,f);
-	 MOD #(64) u_MOD12 (a,c,g);
-	 COMP #(64) u_COMP13 (g,zero,.eq(gEQz));
-	 REG #(64) u_REG14 (zwire,clk,rst,z);
+	 SDEC #(64) s_DEC10 (a,e);
+	 SINC #(64) s_INC11 (c,f);
+	 SMOD #(64) s_MOD12 (a,c,g);
+	 SCOMP #(64) s_COMP13 (g,zero,.eq(gEQz));
+	 SREG #(64) s_REG15 (zwire,clk,rst,z);
 
 
 endmodule

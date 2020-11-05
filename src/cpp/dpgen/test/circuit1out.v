@@ -30,14 +30,13 @@ module circuit1(
 	 wire signed [15:0] f;
 	 wire signed [15:0] g;
 	 wire signed [15:0] xwire;
-	 ADD #(8) s_ADD10 (a,b,d);
-	 ADD #(8) s_ADD11 (a,c,e);
-	 COMP #(16) s_COMP12 (d,e,.gt(g));
-	 MUX2x1 #(8) s_MUX13 (d,e,g,z);
-	 MUL #(16) s_MUL14 (a,c,f);
-	 SUB #(16) s_SUB15 (f,d,xwire);
-	 REG #(16) s_REG16 (zwire,clk,rst,z);
-	 REG #(16) s_REG17 (xwire,clk,rst,x);
+	 SADD #(8) s_ADD10 (a,b,d);
+	 SADD #(8) s_ADD11 (a,c,e);
+	 SCOMP #(16) s_COMP12 (d,e,.gt(g));
+	 SMUX2x1 #(8) s_MUX13 (d,e,g,z);
+	 SMUL #(16) s_MUL14 (a,c,f);
+	 SSUB #(16) s_SUB15 (f,d,xwire);
+	 SREG #(16) s_REG16 (xwire,clk,rst,x);
 
 
 endmodule
