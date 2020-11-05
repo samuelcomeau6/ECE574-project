@@ -190,35 +190,48 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 					}
 					else if (d_list.data_v[i].is_operation)
 					{
-						int max_width = 0;
+        				int max_width = 0;
+	    				comp_op = strstr(d_list.data_v[i].operation_name, "COMP");
+						inc_op = strstr(d_list.data_v[i].operation_name, "INC");
+    					dec_op = strstr(d_list.data_v[i].operation_name, "DEC");
+						bool found_input1 = 0;
+						bool found_input2 = 0;
+						bool found_output = 0;
 						// Search for maximum width and signed
-						for (int y = 0; y < d_list.count; y++)
+						for (int y = 0; y < i; y++)
 						{
-							comp_op = strstr(d_list.data_v[i].operation_name, "COMP");
-    						inc_op = strstr(d_list.data_v[i].operation_name, "INC");
-	    					dec_op = strstr(d_list.data_v[i].operation_name, "DEC");
 						    //Width is determined by the size of the outputs only unless comp
 						    //Sign is determined by the inputs only
-							if (!strcmp(d_list.data_v[i].input_1_name, d_list.data_v[y].input_1_name))
+							if (!strcmp(d_list.data_v[i].input_1_name, d_list.data_v[y].input_1_name) && i!=y)
 							{
 								if (d_list.data_v[y].width > max_width && comp_op)
 									max_width = d_list.data_v[y].width;
 								if (d_list.data_v[y].is_signed)
 								    d_list.data_v[i].is_signed = 1;
+							    found_input1 = 1;
 							}
-							if (!strcmp(d_list.data_v[i].input_2_name, d_list.data_v[y].input_1_name))
+							if (!strcmp(d_list.data_v[i].input_2_name, d_list.data_v[y].input_1_name) && i!=y)
 							{
 								if (d_list.data_v[y].width > max_width && comp_op)
 									max_width = d_list.data_v[y].width;
 								if (d_list.data_v[y].is_signed)
     							    d_list.data_v[i].is_signed = 1;
+							    found_input2 = 1;
 							}
-							if (!strcmp(d_list.data_v[i].output_name, d_list.data_v[y].input_1_name))
+							if (!strcmp(d_list.data_v[i].output_name, d_list.data_v[y].input_1_name) && i!=y)
 							{
 								if (d_list.data_v[y].width > max_width)
 									max_width = d_list.data_v[y].width;
+								found_output = 1;
 							}
 						}
+						if(!found_input1 || (!found_input2 && !inc_op && !dec_op) || !found_output){
+						    printf("INPUT/OUTPUT NOT FOUND\n");
+						    exit(EXIT_FAILURE);
+						}
+						#ifdef DEBUG
+						    printf("Found: I1:%d I2:%d O:%d",found_input1,found_input2,found_output);
+					    #endif
 
 						if(comp_op) // true if this is a compare OP
 						{
@@ -298,21 +311,36 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 					}
 					else if (d_list.data_v[i].is_mux){
 						int max_width = 0;
-						for (int y = 0; y < d_list.count; y++)
+						bool found_input1 = 0;
+						bool found_input2 = 0;
+						bool found_output = 0;
+						for (int y = 0; y < i; y++)
 						{
 						    //Width is only based on output size, not input
-							if (!strcmp(d_list.data_v[i].input_1_name, d_list.data_v[y].input_1_name));
+							if (!strcmp(d_list.data_v[i].input_1_name, d_list.data_v[y].input_1_name) && i!=y);
 							{
 								if (d_list.data_v[y].is_signed)
     							    d_list.data_v[i].is_signed = 1;
+							    found_input1 = 1;
 							}
-							if (!strcmp(d_list.data_v[i].output_name, d_list.data_v[y].input_1_name))
+							if (!strcmp(d_list.data_v[i].input_2_name, d_list.data_v[y].input_1_name) && i!=y);
+							{
+								if (d_list.data_v[y].is_signed)
+    							    d_list.data_v[i].is_signed = 1;
+							    found_input2 = 1;
+							}
+							if (!strcmp(d_list.data_v[i].output_name, d_list.data_v[y].input_1_name) && i!=y)
 							{
 								if (d_list.data_v[y].width > max_width)
 									max_width = d_list.data_v[y].width;
+                                found_output=1;
 							}
 						}
-						
+						if(!(found_input1 && found_input2 && found_output)){
+						    printf("INPUT/OUTPUT NOT FOUND");
+						    exit(EXIT_FAILURE);
+						}
+
 						char* new_line = new char[81];
 					    char* format_string = new char[81];
 						strncpy(format_string,"\t MUX2x1 #(%d) u_MUX2x1%d (%s,%s,%s,%s);\n",81);
@@ -331,22 +359,30 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 					else if (d_list.data_v[i].is_assignment)
 					{
 						int max_width = 0;
+						bool found_input1 = 0;
+						bool found_output = 0;
 						// Search for maximum width and signed
-						for (int y = 0; y < d_list.count; y++)
+						for (int y = 0; y < i; y++)
 						{
 						    //Width is only based on output size, not input
-							if (!strcmp(d_list.data_v[i].input_1_name, d_list.data_v[y].input_1_name))
+							if (!strcmp(d_list.data_v[i].input_1_name, d_list.data_v[y].input_1_name) && i!=y)
 							{
 								/*if (d_list.data_v[y].width > max_width)
 									max_width = d_list.data_v[y].width;*/
 								if (d_list.data_v[y].is_signed)
     							    d_list.data_v[i].is_signed = 1;
+							    found_input1=1;
 							}
-							if (!strcmp(d_list.data_v[i].output_name, d_list.data_v[y].input_1_name))
+							if (!strcmp(d_list.data_v[i].output_name, d_list.data_v[y].input_1_name) && i!=y)
 							{
 								if (d_list.data_v[y].width > max_width)
 									max_width = d_list.data_v[y].width;
+								found_output=1;
 							}
+						}
+						if(!(found_input1 && found_output)){
+						    printf("INPUT/OUTPUT NOT FOUND");
+						    exit(EXIT_FAILURE);
 						}
 
 						char* new_line = new char[81];
