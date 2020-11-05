@@ -28,6 +28,7 @@ jobs:
          cd ./src/cpp/dpgen/
          ./build.sh
          ./test.sh testreport.txt | tee testresult.txt
+         status=$?
       - name: output report
         uses: actions/upload-artifact@v2
         with:
@@ -38,3 +39,5 @@ jobs:
         with:
           name: test-result
           path: src/cpp/dpgen/testresult.txt
+      - name: exit
+        run: exit $status
