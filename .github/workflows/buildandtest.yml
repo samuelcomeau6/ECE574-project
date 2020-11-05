@@ -52,7 +52,7 @@ jobs:
       - name: Test
         run: |
          cd ./src/cpp/dpgen/
-         ./build.sh
+         chmod +x dpgen
          ./test.sh testreport.txt | tee testresult.txt
          status=${PIPESTATUS[0]}
          exit $status
