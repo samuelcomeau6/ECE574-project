@@ -1,6 +1,7 @@
 
 #ifndef DATA_TYPE_H
 #define DATA_TYPE_H
+#include <string>
 
 
 typedef struct
@@ -19,7 +20,7 @@ typedef struct
 	bool  is_assignment;
 	int   width;
 	float duration;
-	char* color;
+	std::string color;
 
 } data_type;
 
