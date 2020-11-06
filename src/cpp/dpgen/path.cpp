@@ -86,7 +86,8 @@ namespace path{
         temp_obj.is_signed      = is_signed;
         temp_obj.is_assignment  = false;
         temp_obj.width          = data_width;
-
+	temp_obj.color 		= "null";
+	    
         d_list.count++;
         d_list.data_v.push_back(temp_obj);
     }
@@ -119,7 +120,8 @@ namespace path{
         temp_obj.is_assignment = false;
         temp_obj.width = 0;
         temp_obj.duration = 0;
-
+	temp_obj.color = "null";
+	    
         d_list.count++;
         d_list.data_v.push_back(temp_obj);
     }
@@ -151,7 +153,8 @@ namespace path{
         temp_obj.is_assignment = false;
         temp_obj.width = 0;
         temp_obj.duration = 0;
-        
+        temp_obj.color = "null";
+	    
         d_list.count++;
         d_list.data_v.push_back(temp_obj);
     }
@@ -176,8 +179,8 @@ namespace path{
         temp_obj.is_assignment = true;
         temp_obj.width = 0;
         temp_obj.duration = 0;
-		temp_obj.color = "none";
-
+	temp_obj.color = "null";
+	    
         d_list.count++;
         d_list.data_v.push_back(temp_obj);
     }
@@ -190,5 +193,5 @@ namespace path{
         }
         d_list.data_v.clear();
     }
-assignDuration(d_list);
+assignDuration(std::d_list);
 }
