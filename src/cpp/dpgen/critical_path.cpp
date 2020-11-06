@@ -55,9 +55,7 @@ int LongestPath(data_list Graph) {
 		for (int i = 0; List.data_v.size(); i++) {
 
 			if ((List.data_v[i].operation_name == "REG" && (Graph.data_v[i] == List.data_v[i]))||(Graph.data_v[i].operation_name != "REG")) {
-				if (List.data_v[i].duration > pathDur) {
-					pathDur = List.data_v[i].duration + pathDur;
-				}
+				pathDur = List.data_v[i].duration + pathDur;
 			}
 		}
 		pathDurStor.push_back(pathDur);
