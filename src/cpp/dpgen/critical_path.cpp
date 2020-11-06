@@ -63,6 +63,8 @@ int LongestPath(data_list Graph) {
 	}
 
 	critPathDur = *max_element(pathDurStor.begin(), pathDurStor.end());
+	
+	cout << "Critical Path: " << critPathDur << " ns";
 }
 
 
