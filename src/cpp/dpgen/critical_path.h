@@ -4,10 +4,10 @@
 #include "data_list.h"
 #include "data_type.h"
 
-int TopSort(data_list Graph, data_list List, data_type vertex);
+void TopSort(data_list Graph, data_list List, data_type vertex);
 
-int TopSortVisit(data_list Graph, data_list List, data_type uVertex);
+void TopSortVisit(data_list Graph, data_list List, data_type uVertex);
 
-int LongestPath(data_list Graph);
+void LongestPath(data_list Graph);
 
 #endif
