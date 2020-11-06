@@ -69,7 +69,7 @@ void LongestPath(data_list Graph) {
 
 
 
-int assignDuration(data_list Graph) {
+void assignDuration(data_list Graph) {
 
 	for (int i = 0; i < Graph.data_v.size(); i++) {
 
