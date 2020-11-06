@@ -190,5 +190,5 @@ namespace path{
         }
         d_list.data_v.clear();
     }
-	void assignDuration(d_list);
+assignDuration(d_list);
 }
