@@ -193,5 +193,4 @@ namespace path{
         }
         d_list.data_v.clear();
     }
-assignDuration(std::d_list);
 }
