@@ -4,7 +4,7 @@
 #include "parse.h"
 #include "path.h"
 #include "data_list.h"
-
+#include "critical_path.h"
 
 namespace path{
     std::string component_to_string(int data_width, bool data_signed, parse::comp_t component){
@@ -190,4 +190,5 @@ namespace path{
         }
         d_list.data_v.clear();
     }
+	void assignDuration(d_list);
 }
