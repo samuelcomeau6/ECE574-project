@@ -5,6 +5,7 @@
 #include <cstring>
 #include "parse.h"
 #include "path.h"
+#include "critical_path.h"
 
 
 
@@ -416,6 +417,7 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 		}
 
 	}
+	assignDuration(d_list);
     path::free_list();
 	fclose(outputfp);
 	fclose(templatefp);
