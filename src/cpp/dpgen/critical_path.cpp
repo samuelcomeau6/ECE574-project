@@ -75,7 +75,7 @@ void assignDuration(data_list Graph) {
 	for (int i = 0; i < Graph.data_v.size(); i++) {
 
 		//Register duration Assignment
-		if (Graph.data_v[i].operation_name == "REG") {
+		if (strcmp(Graph.data_v[i].operation_name,"REG") == 0) {
 			if (Graph.data_v[i].width == 1) {
 				Graph.data_v[i].duration = 2.616;
 			}
@@ -101,7 +101,7 @@ void assignDuration(data_list Graph) {
 		//case parse::ADD:     output = "ADD"; break;
 
 		//Add duration Assignment
-		if (Graph.data_v[i].operation_name == "ADD") {
+		if (strcmp(Graph.data_v[i].operation_name, "ADD") == 0) {
 			if (Graph.data_v[i].width == 1) {
 				Graph.data_v[i].duration = 2.704;
 			}
@@ -126,7 +126,7 @@ void assignDuration(data_list Graph) {
 		}
 		//case parse::SUB:     output = "SUB"; break;
 		//Subtractor duration Assignment
-		if (Graph.data_v[i].operation_name == "SUB") {
+		if (strcmp(Graph.data_v[i].operation_name, "SUB") == 0) {
 			if (Graph.data_v[i].width == 1) {
 				Graph.data_v[i].duration = 3.024;
 			}
@@ -151,7 +151,7 @@ void assignDuration(data_list Graph) {
 		}
 		//case parse::MUL:     output = "MUL"; break;
 		//Mul duration Assignment
-		if (Graph.data_v[i].operation_name == "MUL") {
+		if (strcmp(Graph.data_v[i].operation_name, "MUL") == 0) {
 			if (Graph.data_v[i].width == 1) {
 				Graph.data_v[i].duration = 2.438;
 			}
@@ -176,7 +176,7 @@ void assignDuration(data_list Graph) {
 		}
 		//case parse::COMPLT:  output = "COMP<"; break;
 		//COMP duration Assignment
-		if (Graph.data_v[i].operation_name == "COMPLT") {
+		if (strcmp(Graph.data_v[i].operation_name, "COMPLT") == 0) {
 			if (Graph.data_v[i].width == 1) {
 				Graph.data_v[i].duration = 3.031;
 			}
@@ -201,7 +201,7 @@ void assignDuration(data_list Graph) {
 		}
 		//case parse::COMPEQ:  output = "COMP=="; break;
 		//Comp duration Assignment
-		if (Graph.data_v[i].operation_name == "COMPEQ") {
+		if (strcmp(Graph.data_v[i].operation_name, "COMPEQ") == 0) {
 			if (Graph.data_v[i].width == 1) {
 				Graph.data_v[i].duration = 3.031;
 			}
@@ -226,7 +226,7 @@ void assignDuration(data_list Graph) {
 		}
 		//case parse::COMPGT:  output = "COMP>"; break;
 		//Comp duration Assignment
-		if (Graph.data_v[i].operation_name == "COMPGT") {
+		if (strcmp(Graph.data_v[i].operation_name, "COMPGT") == 0) {
 			if (Graph.data_v[i].width == 1) {
 				Graph.data_v[i].duration = 3.031;
 			}
@@ -251,7 +251,7 @@ void assignDuration(data_list Graph) {
 		}
 		//case parse::MUX2X1:  output = "MUX2X1"; break;
 		//Mux duration Assignment
-		if (Graph.data_v[i].operation_name == "MUX2X1") {
+		if (strcmp(Graph.data_v[i].operation_name, "MUX2X1") == 0) {
 			if (Graph.data_v[i].width == 1) {
 				Graph.data_v[i].duration = 4.083;
 			}
@@ -276,7 +276,7 @@ void assignDuration(data_list Graph) {
 		}
 		//case parse::SHR:     output = "SHR"; break;
 		//Shr duration Assignment
-		if (Graph.data_v[i].operation_name == "SHR") {
+		if (strcmp(Graph.data_v[i].operation_name, "SHR") == 0) {
 			if (Graph.data_v[i].width == 1) {
 				Graph.data_v[i].duration = 3.644;
 			}
@@ -301,7 +301,7 @@ void assignDuration(data_list Graph) {
 		}
 		//case parse::SHL:     output = "SHL"; break;
 		//Shl duration Assignment
-		if (Graph.data_v[i].operation_name == "SHL") {
+		if (strcmp(Graph.data_v[i].operation_name, "SHL") == 0) {
 			if (Graph.data_v[i].width == 1) {
 				Graph.data_v[i].duration = 3.614;
 			}
@@ -326,7 +326,7 @@ void assignDuration(data_list Graph) {
 		}
 		//case parse::DIV:     output = "DIV"; break;
 		//Div duration Assignment
-		if (Graph.data_v[i].operation_name == "DIV") {
+		if (strcmp(Graph.data_v[i].operation_name, "DIV") == 0) {
 			if (Graph.data_v[i].width == 1) {
 				Graph.data_v[i].duration = 0.619;
 			}
@@ -351,7 +351,7 @@ void assignDuration(data_list Graph) {
 		}
 		//case parse::MOD:     output = "MOD"; break;
 		//Mod duration Assignment
-		if (Graph.data_v[i].operation_name == "MOD") {
+		if (strcmp(Graph.data_v[i].operation_name, "MOD") == 0) {
 			if (Graph.data_v[i].width == 1) {
 				Graph.data_v[i].duration = 0.758;
 			}
@@ -376,7 +376,7 @@ void assignDuration(data_list Graph) {
 		}
 		//case parse::INC:     output = "INC"; break;
 		//Inc duration Assignment
-		if (Graph.data_v[i].operation_name == "INC") {
+		if (strcmp(Graph.data_v[i].operation_name, "INC") == 0) {
 			if (Graph.data_v[i].width == 1) {
 				Graph.data_v[i].duration = 1.792;
 			}
@@ -401,7 +401,7 @@ void assignDuration(data_list Graph) {
 		}
 		//case parse::DEC:     output = "DEC"; break;
 		//Dec duration Assignment
-		if (Graph.data_v[i].operation_name == "DEC") {
+		if (strcmp(Graph.data_v[i].operation_name, "DEC") == 0) {
 			if (Graph.data_v[i].width == 1) {
 				Graph.data_v[i].duration = 1.792;
 			}
@@ -426,7 +426,7 @@ void assignDuration(data_list Graph) {
 		}
 		//case parse::WIRE:    output = "WIRE"; break;
 		//wire duration Assignment
-		if (Graph.data_v[i].operation_name == "WIRE") {
+		if (strcmp(Graph.data_v[i].operation_name, "WIRE") == 0) {
 			Graph.data_v[i].duration = 0;
 		}
 	}
