@@ -5,6 +5,7 @@
 #include "path.h"
 #include "data_list.h"
 #include "data_type.h"
+#include "critical_path.h"
 
 using namespace std;
 
