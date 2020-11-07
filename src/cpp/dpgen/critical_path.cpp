@@ -27,10 +27,10 @@ void TopSortVisit(data_list Graph, data_list List, data_type uVertex) {
 
 		if (uVertex.output_name == Graph.data_v[i].input_1_name || uVertex.output_name == Graph.data_v[i].input_2_name) {
 
-			if (Graph.data_v[i].color == "White" && Graph.data_v[i].operation_name != "REG") {
+			if (Graph.data_v[i].color == "White" && strcmp(Graph.data_v[i].operation_name,"REG") == 1) {
 				TopSortVisit(Graph, List, Graph.data_v[i]);
 			}
-			else if (Graph.data_v[i].color == "White" && Graph.data_v[i].operation_name == "REG") {
+			else if (Graph.data_v[i].color == "White" && strcmp(Graph.data_v[i].operation_name,"REG") == 0) {
 				Graph.data_v[i].color = "Black";
 				List.data_v.push_back(Graph.data_v[i]);
 			}
@@ -40,6 +40,25 @@ void TopSortVisit(data_list Graph, data_list List, data_type uVertex) {
 	}
 }
 
+bool nodeCompare(data_type graphNode, data_type listNode){
+
+	return graphNode.input_1_name == listNode.input_1_name &&
+		graphNode.input_2_name == listNode.input_2_name &&
+		graphNode.output_name == listNode.output_name &&
+		graphNode.operation_name == listNode.operation_name &&
+		graphNode.is_input == listNode.is_input &&
+		graphNode.is_output == listNode.is_output &&
+		graphNode.is_operation == listNode.is_operation &&
+		graphNode.is_mux == listNode.is_mux &&
+		graphNode.is_wire == listNode.is_wire &&
+		graphNode.is_reg == listNode.is_reg &&
+		graphNode.is_signed == listNode.is_signed &&
+		graphNode.is_assignment == listNode.is_assignment &&
+		graphNode.width == listNode.width &&
+		graphNode.duration == listNode.duration &&
+		graphNode.color == listNode.color;
+
+}
 
 void LongestPath(data_list Graph) {
 
@@ -48,14 +67,17 @@ void LongestPath(data_list Graph) {
 	float critPathDur = 0;
 	data_list List;
 	vector<float> pathDurStor;
+	bool eqNodes = 0;
 
 	for (int i = 0; Graph.data_v.size(); i++) {
 
 		TopSort(Graph, List, Graph.data_v[i]);
 
 		for (int i = 0; List.data_v.size(); i++) {
+			
+			eqNodes = nodeCompare(Graph.data_v[i], List.data_v[i]);
 
-			if ((List.data_v[i].operation_name == "REG" && (Graph.data_v[i] == List.data_v[i]))||(Graph.data_v[i].operation_name != "REG")) {
+			if ((strcmp(Graph.data_v[i].operation_name,"REG") == 0 && eqNodes == 1)||(strcmp(Graph.data_v[i].operation_name,"REG") == 1)) {
 				pathDur = List.data_v[i].duration + pathDur;
 			}
 		}
