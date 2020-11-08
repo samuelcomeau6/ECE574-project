@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <cstring>
 #include <vector>
 #include <algorithm>
 #include "path.h"
