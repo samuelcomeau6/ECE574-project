@@ -1,6 +1,7 @@
 #ifndef CRITICAL_PATH_H
 #define CRITICAL_PATH_H
 
+#include <string>
 #include "data_list.h"
 #include "data_type.h"
 
