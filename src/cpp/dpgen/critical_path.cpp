@@ -25,19 +25,25 @@ void TopSortVisit(data_list Graph, data_list List, data_type uVertex) {
 
 	uVertex.color = "Gray";
 	for (int i = 0; Graph.data_v.size(); i++) {
+		//if (Graph.data_v[i].is_operation == 1) {
+			if (uVertex.output_name == Graph.data_v[i].input_1_name || uVertex.output_name == Graph.data_v[i].input_2_name) {
 
-		if (uVertex.output_name == Graph.data_v[i].input_1_name || uVertex.output_name == Graph.data_v[i].input_2_name) {
-
-			if (Graph.data_v[i].color == "White" && strcmp(Graph.data_v[i].operation_name,"REG") == 1) {
-				TopSortVisit(Graph, List, Graph.data_v[i]);
-			}
-			else if (Graph.data_v[i].color == "White" && strcmp(Graph.data_v[i].operation_name,"REG") == 0) {
+				if (Graph.data_v[i].color == "White" && Graph.data_v[i].operation_name != "REG") {
+					List.data_v.push_back(Graph.data_v[i]);
+					TopSortVisit(Graph, List, Graph.data_v[i]);
+					
+				}
+				else if (Graph.data_v[i].color == "White" && Graph.data_v[i].operation_name == "REG") {
+					Graph.data_v[i].color = "Black";
+					List.data_v.push_back(Graph.data_v[i]);
+				}
 				Graph.data_v[i].color = "Black";
-				List.data_v.push_back(Graph.data_v[i]);
+				//List.data_v.push_back(Graph.data_v[i]);
 			}
-			Graph.data_v[i].color = "Black";
-			List.data_v.push_back(Graph.data_v[i]);
-		}
+		//}
+		//else {
+		//	continue;
+		//}
 	}
 }
 
@@ -72,23 +78,31 @@ void LongestPath(data_list Graph) {
 
 	for (int i = 0; Graph.data_v.size(); i++) {
 
-		TopSort(Graph, List, Graph.data_v[i]);
+		if (Graph.data_v[i].is_operation == 1) {
 
-		for (int i = 0; List.data_v.size(); i++) {
-			
-			eqNodes = nodeCompare(Graph.data_v[i], List.data_v[i]);
+			TopSort(Graph, List, Graph.data_v[i]);
 
-			if ((strcmp(Graph.data_v[i].operation_name,"REG") == 0 && eqNodes == 1)||(strcmp(Graph.data_v[i].operation_name,"REG") == 1)) {
-				pathDur = List.data_v[i].duration + pathDur;
+			for (int i = 0; List.data_v.size(); i++) {
+
+				eqNodes = nodeCompare(Graph.data_v[i], List.data_v[i]);
+
+				if ((List.data_v[i].operation_name == "REG" && (eqNodes == 1)) || (Graph.data_v[i].operation_name != "REG")) {
+
+					pathDur = List.data_v[i].duration + pathDur;
+				}
 			}
+			pathDurStor.push_back(pathDur);
+			pathDur = 0;
 		}
-		pathDurStor.push_back(pathDur);
-		pathDur = 0;
+		else {
+			continue;
+		}
 	}
 
 	critPathDur = *max_element(pathDurStor.begin(), pathDurStor.end());
-	
+
 	cout << "Critical Path: " << critPathDur << " ns";
+
 }
 
 
