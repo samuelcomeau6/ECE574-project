@@ -76,7 +76,8 @@ namespace path{
         strcpy(temp_obj.input_1_name, name.c_str());
         temp_obj.input_2_name   = 0;
         temp_obj.output_name    = 0;
-        temp_obj.operation_name = 0;
+        temp_obj.operation_name = new char[operation_toString(component_type).size() + 1];
+        strcpy(temp_obj.operation_name, operation_toString(component_type).c_str());
         temp_obj.is_input       = (component_type == parse::INPUT);
         temp_obj.is_output      = (component_type == parse::OUTPUT);
         temp_obj.is_operation   = false;
@@ -168,7 +169,8 @@ namespace path{
         strcpy(temp_obj.output_name, left.c_str());
         strcpy(temp_obj.input_1_name, right.c_str());
         temp_obj.input_2_name = 0;
-        temp_obj.operation_name = 0;
+        temp_obj.operation_name = new char[operation_toString(parse::REG).size() + 1];
+        strcpy(temp_obj.operation_name, operation_toString(parse::REG).c_str());
         temp_obj.is_input = false;
         temp_obj.is_output = false;
         temp_obj.is_operation = false;

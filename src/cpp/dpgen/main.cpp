@@ -233,9 +233,9 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 						    exit(EXIT_FAILURE);
 						}
 						#ifdef DEBUG
-						    printf("Found: I1:%d I2:%d O:%d",found_input1,found_input2,found_output);
+						    printf("Found: I1:%d I2:%d O:%d\n",found_input1,found_input2,found_output);
 					    #endif
-
+                        d_list.data_v[i].width=max_width;
 						if(comp_op) // true if this is a compare OP
 						{
 							char op[] = "00";
@@ -348,6 +348,7 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 						    printf("INPUT/OUTPUT NOT FOUND");
 						    exit(EXIT_FAILURE);
 						}
+                        d_list.data_v[i].width=max_width;
 
 						char* new_line = new char[81];
 					    char* format_string = new char[81];
@@ -393,7 +394,7 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 						    printf("INPUT/OUTPUT NOT FOUND");
 						    exit(EXIT_FAILURE);
 						}
-
+                        d_list.data_v[i].width=max_width;
 						char* new_line = new char[81];
 						char* format_string = new char[81];
 						strncpy(format_string,"\t REG #(%d) u_REG%d (%s,clk,rst,%s);\n",81);
@@ -417,7 +418,8 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 		}
 
 	}
-	assignDuration(d_list);
+	assignDuration(&d_list);
+	printf("Critical path %f",LongestPath(d_list));
     path::free_list();
 	fclose(outputfp);
 	fclose(templatefp);
