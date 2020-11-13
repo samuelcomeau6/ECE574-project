@@ -10,65 +10,65 @@
 
 using namespace std;
 
-void TopSort(data_list Graph, data_list * List, data_type vertex) {
+void TopSort(data_list * Graph, data_list * List, data_type vertex) {
 
-	for (int i = 0; i<Graph.data_v.size(); i++) {
+	for (int i = 0; i<Graph->data_v.size(); i++) {
 
-		Graph.data_v[i].color = "White";
-		TopSortVisit(Graph, List, Graph.data_v[i]);
+		Graph->data_v[i].color = "White";
+		TopSortVisit(Graph, List, Graph->data_v[i]);
 
 	}
 }
 
-void TopSortVisit(data_list Graph, data_list * List, data_type uVertex) {
+void TopSortVisit(data_list * Graph, data_list * List, data_type uVertex) {
 
 
 	uVertex.color = "Gray";
-	for (int i = 0; i<Graph.data_v.size(); i++) {
-		if (Graph.data_v[i].is_operation) {
+	for (int i = 0; i<Graph->data_v.size(); i++) {
+		if (Graph->data_v[i].is_operation) {
             if (!uVertex.is_operation){
-    			if (strcmp(uVertex.input_1_name,Graph.data_v[i].input_1_name)==0 || strcmp(uVertex.input_1_name,Graph.data_v[i].input_2_name)==0) {
-                    if (Graph.data_v[i].color == "White"){
-        				if (strcmp(Graph.data_v[i].operation_name,"REG") != 0) {
-    	    				List->data_v.push_back(Graph.data_v[i]);
+    			if (strcmp(uVertex.input_1_name,Graph->data_v[i].input_1_name)==0 || strcmp(uVertex.input_1_name,Graph->data_v[i].input_2_name)==0) {
+                    if (Graph->data_v[i].color == "White"){
+        				if (strcmp(Graph->data_v[i].operation_name,"REG") != 0) {
+    	    				List->data_v.push_back(Graph->data_v[i]);
     	    				#ifdef DEBUG
-    	    				    printf("Added #%d:%s\n",i,Graph.data_v[i].operation_name);
+    	    				    printf("Added #%d:%s\n",i,Graph->data_v[i].operation_name);
 	    				    #endif
-    			    		TopSortVisit(Graph, List, Graph.data_v[i]);
+    			    		TopSortVisit(Graph, List, Graph->data_v[i]);
         				}
-    	    			else if (strcmp(Graph.data_v[i].operation_name, "REG")==0) {
-    		    			Graph.data_v[i].color = "Black";
-    				    	List->data_v.push_back(Graph.data_v[i]);
+    	    			else if (strcmp(Graph->data_v[i].operation_name, "REG")==0) {
+    		    			Graph->data_v[i].color = "Black";
+    				    	List->data_v.push_back(Graph->data_v[i]);
     	    				#ifdef DEBUG
-    	    				    printf("Added #%d:%s\n",i,Graph.data_v[i].operation_name);
+    	    				    printf("Added #%d:%s\n",i,Graph->data_v[i].operation_name);
 	    				    #endif
     				    }
     			    }
-    				Graph.data_v[i].color = "Black";
-    				//List.data_v.push_back(Graph.data_v[i]);
+    				Graph->data_v[i].color = "Black";
+    				//List.data_v.push_back(Graph->data_v[i]);
     			}
 			}
 			else {
-				if (strcmp(uVertex.output_name,Graph.data_v[i].input_1_name)==0 ||
-				        strcmp(uVertex.output_name,Graph.data_v[i].input_2_name)==0) {
-                    if (Graph.data_v[i].color == "White"){
-        				if (strcmp(Graph.data_v[i].operation_name,"REG") != 0) {
-    	    				List->data_v.push_back(Graph.data_v[i]);
+				if (strcmp(uVertex.output_name,Graph->data_v[i].input_1_name)==0 ||
+				        strcmp(uVertex.output_name,Graph->data_v[i].input_2_name)==0) {
+                    if (Graph->data_v[i].color == "White"){
+        				if (strcmp(Graph->data_v[i].operation_name,"REG") != 0) {
+    	    				List->data_v.push_back(Graph->data_v[i]);
     	    				#ifdef DEBUG
-    	    				    printf("Added #%d:%s\n",i,Graph.data_v[i].operation_name);
+    	    				    printf("Added #%d:%s\n",i,Graph->data_v[i].operation_name);
 	    				    #endif
-    			    		TopSortVisit(Graph, List, Graph.data_v[i]);
+    			    		TopSortVisit(Graph, List, Graph->data_v[i]);
         				}
-    	    			else if (strcmp(Graph.data_v[i].operation_name, "REG")==0) {
-    		    			Graph.data_v[i].color = "Black";
-    				    	List->data_v.push_back(Graph.data_v[i]);
+    	    			else if (strcmp(Graph->data_v[i].operation_name, "REG")==0) {
+    		    			Graph->data_v[i].color = "Black";
+    				    	List->data_v.push_back(Graph->data_v[i]);
     	    				#ifdef DEBUG
-    	    				    printf("Added #%d:%s\n",i,Graph.data_v[i].operation_name);
+    	    				    printf("Added #%d:%s\n",i,Graph->data_v[i].operation_name);
 	    				    #endif
     				    }
     			    }
-    				Graph.data_v[i].color = "Black";
-    				//List.data_v.push_back(Graph.data_v[i]);
+    				Graph->data_v[i].color = "Black";
+    				//List.data_v.push_back(Graph->data_v[i]);
     			}
 			}
 
@@ -80,46 +80,52 @@ void TopSortVisit(data_list Graph, data_list * List, data_type uVertex) {
 }
 
 bool nodeCompare(data_type graphNode, data_type listNode){
-
-	return graphNode.input_1_name == listNode.input_1_name &&
-		graphNode.input_2_name == listNode.input_2_name &&
-		graphNode.output_name == listNode.output_name &&
-		graphNode.operation_name == listNode.operation_name &&
-		graphNode.is_input == listNode.is_input &&
-		graphNode.is_output == listNode.is_output &&
-		graphNode.is_operation == listNode.is_operation &&
-		graphNode.is_mux == listNode.is_mux &&
-		graphNode.is_wire == listNode.is_wire &&
-		graphNode.is_reg == listNode.is_reg &&
-		graphNode.is_signed == listNode.is_signed &&
-		graphNode.is_assignment == listNode.is_assignment &&
-		graphNode.width == listNode.width &&
-		graphNode.duration == listNode.duration &&
-		graphNode.color == listNode.color;
+        bool output=1;
+	    if(graphNode.input_1_name!=NULL && listNode.input_1_name!=NULL)
+            {output = output && !strcmp(graphNode.input_1_name,listNode.input_1_name);}
+        else { return (graphNode.input_1_name == listNode.input_1_name); }
+	    if(graphNode.input_2_name!=NULL &&  listNode.input_2_name != NULL){
+            output = output && !strcmp(graphNode.input_2_name,listNode.input_2_name);}
+        else{ return(graphNode.input_2_name == listNode.input_2_name);}
+        if(graphNode.output_name!=NULL && listNode.output_name != NULL){
+            output = output && !strcmp(graphNode.output_name,listNode.output_name);}
+        else{ return(graphNode.output_name == listNode.output_name);}
+        if(graphNode.operation_name!=NULL && listNode.operation_name != NULL){
+            output = output && !strcmp(graphNode.operation_name,listNode.operation_name);}
+        else{ return(graphNode.operation_name == listNode.operation_name);}
+		output = output && (graphNode.is_input == listNode.is_input);
+        output = output && (graphNode.is_output == listNode.is_output);
+        output = output && (graphNode.is_operation == listNode.is_operation);
+        output = output && (graphNode.is_mux == listNode.is_mux);
+        output = output && (graphNode.is_wire == listNode.is_wire);
+        output = output && (graphNode.is_reg == listNode.is_reg);
+        output = output && (graphNode.is_signed == listNode.is_signed);
+        output = output && (graphNode.is_assignment == listNode.is_assignment);
+        output = output && (graphNode.width == listNode.width);
+        output = output && (graphNode.duration == listNode.duration);
+		output = output && (graphNode.color == listNode.color);
+		return output;
 
 }
 
-float LongestPath(data_list Graph) {
+float LongestPath(data_list * Graph) {
 
 	int max = 0;
 	float pathDur = 0;
 	float critPathDur = 0;
-	data_list List;
 	vector<float> pathDurStor;
 	bool eqNodes = 0;
 
-	for (int i = 0; i<Graph.data_v.size(); i++) {
-
-		if (Graph.data_v[i].is_operation) {
-			TopSort(Graph, &List, Graph.data_v[i]);
-            printf("List size is %d\n",List.data_v.size());
+	for (int i = 0; i<Graph->data_v.size(); i++) {
+    	data_list List;
+		if (Graph->data_v[i].is_operation) {
+			TopSort(Graph, &List, Graph->data_v[i]);
 			for (int i = 0; i<List.data_v.size(); i++) {
 
-				eqNodes = nodeCompare(Graph.data_v[i], List.data_v[i]);
+				eqNodes = nodeCompare(Graph->data_v[i], List.data_v[i]);
 
-				if ((List.data_v[i].operation_name == "REG" && (eqNodes == 1)) || (Graph.data_v[i].operation_name != "REG")) {
-
-					pathDur = List.data_v[i].duration + pathDur;
+				if ((List.data_v[i].operation_name == "REG" && (eqNodes == 1)) || (Graph->data_v[i].operation_name != "REG")) {
+				    pathDur = List.data_v[i].duration + pathDur;
 					#ifdef DEBUG
 					    printf("Path duration after i:%d:%s:%f is %fns\n",i,List.data_v[i].operation_name,List.data_v[i].duration,pathDur);
 				    #endif
