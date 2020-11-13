@@ -424,7 +424,7 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 
 	}
 	assignDuration(&d_list);
-	printf("Critical path %f\n",LongestPath(&d_list));
+	printf("Critical Path : %.3f ns\n",LongestPath(&d_list));
     path::free_list();
 	fclose(outputfp);
 	fclose(templatefp);
