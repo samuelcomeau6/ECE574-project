@@ -49,17 +49,6 @@ using namespace std;
 
 
 namespace parse{
-    /* open_netlist
-        Recieves the name of an input file as a string and appropriately opens it
-    */
-    ifstream open_netlist(std::string filename){
-        ifstream netlist(filename, std::ios::in);
-        if(!netlist.is_open()){
-            cout << "error" << "\n";
-        }
-        return netlist;
-    }
-
     /* get_line
         Recieves an opened netlist file and returns the next line as a string
     */
@@ -158,7 +147,7 @@ namespace parse{
         implements other functions to return a completed netlist type
     */
     void parse(std::string filename){
-        ifstream netlist = open_netlist(filename);
+        ifstream netlist(filename, std::ios::in);
         std::string out;
         while(!netlist.eof()){
             out = parse_line(get_line(&netlist));

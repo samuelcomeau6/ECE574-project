@@ -1,6 +1,4 @@
 #!/bin/bash
-cd ../../
-dir=$PWD
 subfolder="./submission/NetID1_NetID2_NetID3_dpgen"
 rm -rf $subfolder
 mkdir -p $subfolder/src
@@ -9,4 +7,6 @@ cp ./src/cpp/dpgen/*.h $subfolder/src/
 cp ./src/cpp/dpgen/*.vh $subfolder/src/
 cp ./src/cpp/dpgen/CMakeLists.txt $subfolder/src/
 cp ./src/cpp/dpgen/CMakeLists.txt $subfolder/
-printf "add_subdirectory(src)" > $subfolder/CMakeLists.txt
+printf "cmake_minimum_required(VERSION 3.17)\n" > $subfolder/CMakeLists.txt
+printf "project(dpgen)\n" >> $subfolder/CMakeLists.txt
+printf "add_subdirectory(src)" >> $subfolder/CMakeLists.txt
