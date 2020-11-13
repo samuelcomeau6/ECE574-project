@@ -321,6 +321,7 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 						int max_width = 0;
 						bool found_input1 = 0;
 						bool found_input2 = 0;
+						bool found_select = 0;
 						bool found_output = 0;
 						for (int y = 0; y < i; y++)
 						{
@@ -328,23 +329,27 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 							if (!strcmp(d_list.data_v[i].input_1_name, d_list.data_v[y].input_1_name) && i!=y);
 							{
 								if (d_list.data_v[y].is_signed)
-    							    d_list.data_v[i].is_signed = 1;
-							    found_input1 = 1;
+    							    d_list.data_v[i].is_signed = true;
+							    found_input1 = true;
+							}
+							if (!strcmp(d_list.data_v[i].shift_select, d_list.data_v[y].input_1_name) && i!=y);
+							{
+							    found_select = true;
 							}
 							if (!strcmp(d_list.data_v[i].input_2_name, d_list.data_v[y].input_1_name) && i!=y);
 							{
 								if (d_list.data_v[y].is_signed)
-    							    d_list.data_v[i].is_signed = 1;
-							    found_input2 = 1;
+    							    d_list.data_v[i].is_signed = true;
+							    found_input2 = true;
 							}
 							if (!strcmp(d_list.data_v[i].output_name, d_list.data_v[y].input_1_name) && i!=y)
 							{
 								if (d_list.data_v[y].width > max_width)
 									max_width = d_list.data_v[y].width;
-                                found_output=1;
+                                found_output=true;
 							}
 						}
-						if(!(found_input1 && found_input2 && found_output)){
+						if(!(found_input1 && found_input2 && found_output && found_select)){
 						    printf("INPUT/OUTPUT NOT FOUND");
 						    exit(EXIT_FAILURE);
 						}
@@ -359,7 +364,7 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 							i,
 							d_list.data_v[i].input_1_name,
 							d_list.data_v[i].input_2_name,
-							d_list.data_v[i].operation_name,
+							d_list.data_v[i].shift_select,
 							d_list.data_v[i].output_name
 						);
 						fputs(new_line, outputfp);

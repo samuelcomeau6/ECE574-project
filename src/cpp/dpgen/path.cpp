@@ -38,7 +38,7 @@ namespace path{
     }
     std::string operation_toString(parse::comp_t component) {
         std::string output;
-        
+
         switch (component) {
         case parse::ERR:     output = "ERROR"; break;
         case parse::REG:     output = "REG"; break;
@@ -75,6 +75,7 @@ namespace path{
         temp_obj.input_1_name = new char[name.size() + 1];
         strcpy(temp_obj.input_1_name, name.c_str());
         temp_obj.input_2_name   = 0;
+        temp_obj.shift_select   = 0;
         temp_obj.output_name    = 0;
         temp_obj.operation_name = new char[operation_toString(component_type).size() + 1];
         strcpy(temp_obj.operation_name, operation_toString(component_type).c_str());
@@ -87,8 +88,8 @@ namespace path{
         temp_obj.is_signed      = is_signed;
         temp_obj.is_assignment  = false;
         temp_obj.width          = data_width;
-	temp_obj.color 		= "null";
-	    
+    	temp_obj.color 		= "null";
+
         d_list.count++;
         d_list.data_v.push_back(temp_obj);
     }
@@ -105,6 +106,7 @@ namespace path{
         data_type temp_obj;
         temp_obj.input_1_name = new char[input1.size() + 1];
         temp_obj.input_2_name = new char[input2.size() + 1];
+        temp_obj.shift_select   = 0;
         temp_obj.output_name = new char[output.size() + 1];
         temp_obj.operation_name = new char[operation_toString(component_type).size() + 1];
         strcpy(temp_obj.input_1_name, input1.c_str());
@@ -121,29 +123,24 @@ namespace path{
         temp_obj.is_assignment = false;
         temp_obj.width = 0;
         temp_obj.duration = 0;
-	temp_obj.color = "null";
-	    
+    	temp_obj.color = "null";
+
         d_list.count++;
         d_list.data_v.push_back(temp_obj);
     }
-    void add_mux(std::string input, std::string is_true, std::string is_false, std::string output){
-        #ifdef DEBUG
-            std::cout << "New ";
-            std::cout << "MUX";
-            std::cout << " with input " << input << " with options ";
-            std::cout << is_true << " if true and " << is_false << " if false";
-            std::cout << " and output " << output << std::endl;
-        #endif
+    void add_mux(std::string select, std::string is_true, std::string is_false, std::string output){
 
         data_type temp_obj;
         temp_obj.input_1_name = new char[is_true.size() + 1];
         temp_obj.input_2_name = new char[is_false.size() + 1];
+        temp_obj.shift_select = new char[select.size() + 1];
         temp_obj.output_name = new char[output.size() + 1];
-        temp_obj.operation_name = new char[input.size() + 1];
+        temp_obj.operation_name = new char[operation_toString(parse::MUX2X1).size() + 1];
         strcpy(temp_obj.input_1_name, is_true.c_str());
         strcpy(temp_obj.input_2_name, is_false.c_str());
+        strcpy(temp_obj.shift_select, select.c_str());
         strcpy(temp_obj.output_name, output.c_str());
-        strcpy(temp_obj.operation_name, input.c_str());
+        strcpy(temp_obj.operation_name, operation_toString(parse::MUX2X1).c_str());
         temp_obj.is_input = false;
         temp_obj.is_output = false;
         temp_obj.is_operation = false;
@@ -155,7 +152,16 @@ namespace path{
         temp_obj.width = 0;
         temp_obj.duration = 0;
         temp_obj.color = "null";
-	    
+
+        #ifdef DEBUG
+            std::cout << "New ";
+            std::cout << "MUX";
+            std::cout << " with select " << temp_obj.shift_select << " with options ";
+            std::cout << temp_obj.input_1_name << " if true and " << temp_obj.input_2_name << " if false";
+            std::cout << " and output " << temp_obj.output_name << std::endl;
+        #endif
+
+
         d_list.count++;
         d_list.data_v.push_back(temp_obj);
     }
@@ -169,6 +175,7 @@ namespace path{
         strcpy(temp_obj.output_name, left.c_str());
         strcpy(temp_obj.input_1_name, right.c_str());
         temp_obj.input_2_name = 0;
+        temp_obj.shift_select   = 0;
         temp_obj.operation_name = new char[operation_toString(parse::REG).size() + 1];
         strcpy(temp_obj.operation_name, operation_toString(parse::REG).c_str());
         temp_obj.is_input = false;
@@ -181,8 +188,8 @@ namespace path{
         temp_obj.is_assignment = true;
         temp_obj.width = 0;
         temp_obj.duration = 0;
-	temp_obj.color = "null";
-	    
+    	temp_obj.color = "null";
+
         d_list.count++;
         d_list.data_v.push_back(temp_obj);
     }

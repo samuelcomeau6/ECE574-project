@@ -8,6 +8,7 @@ typedef struct
 {
 	char* input_1_name;
 	char* input_2_name;
+	char* shift_select;
 	char* output_name;
 	char* operation_name;
 	bool  is_input;

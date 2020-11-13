@@ -2,7 +2,8 @@
 #include "parse.h"
 #include "data_list.h"
 
-
+#ifndef PATH_H
+#define PATH_H
 extern data_list d_list;
 
 namespace path{
@@ -13,3 +14,4 @@ namespace path{
     void add_assignment(std::string left, std::string right);
     void free_list();
 }
+#endif
