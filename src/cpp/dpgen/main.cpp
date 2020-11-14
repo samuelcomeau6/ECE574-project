@@ -17,10 +17,8 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 	
 int main(int argc, char* argv[])
 {
-	char temp_name[81];
-	char temp_name2[81];
 	char module_name[81];
-	char* ptr;
+	d_list.count = 0;
 
 	// Error if user does not supply 2 arguments
 	if (argc != 3)
@@ -173,12 +171,106 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 				char* comp_op;
 				char* inc_op;
 				char* dec_op;
-				char* mux_op;
+
+				//loop through all objects
 				for (int i = 0; i < d_list.count; i++)
 				{
+					int   input_1_width = 0;
+					int   input_2_width = 0;
+					int   output_width = 0;
+					bool  input_1_signed = false;
+					bool  input_2_signed = false;
+					bool  output_signed = false;
+					int   max_width = 0;
+					bool  found_input1 = 0;
+					bool  found_input2 = 0;
+					bool  found_output = 0;
+					bool  op_signed = 0;
+
+					char* sign_char = new char[2];
+					char* operand_a = new char[81];
+					char* operand_b = new char[81];
+					char* new_line = new char[81];
+
+					// locally Assign widths to all inputs/outputs
+					for (int y = 0; y < d_list.count; y++)
+					{
+						//we are only looking for objects that are inputs or outputs or wires
+						if (!(d_list.data_v[y].is_input || d_list.data_v[y].is_output || d_list.data_v[y].is_wire))
+							continue;
+
+						//Width is determined by the size of the outputs only unless comp
+						//Sign is determined by the inputs only
+						if (d_list.data_v[i].input_1_name) //check for null
+						{
+							if (!strcmp(d_list.data_v[i].input_1_name, d_list.data_v[y].input_1_name))
+							{
+								input_1_width = d_list.data_v[y].width;
+								input_1_signed = d_list.data_v[y].is_signed;
+								found_input1 = 1;
+							}
+						}
+						if (d_list.data_v[i].input_2_name) //check for null
+						{
+							if (!strcmp(d_list.data_v[i].input_2_name, d_list.data_v[y].input_1_name))
+							{
+								input_2_width = d_list.data_v[y].width;
+								input_2_signed = d_list.data_v[y].is_signed;
+								found_input2 = 1;
+							}
+						}
+						if (d_list.data_v[i].output_name) //check for null
+						{
+							if (!strcmp(d_list.data_v[i].output_name, d_list.data_v[y].input_1_name))
+							{
+								output_width = d_list.data_v[y].width;
+								output_signed = d_list.data_v[y].is_signed;
+								found_output = 1;
+							}
+						}
+					}
+
+					//set max width
+					max_width = input_1_width;
+					if (input_2_width > max_width)
+						max_width = input_2_width;
+					if (output_width > max_width)
+						max_width = output_width;
+
+					// deterine if this operation is signed, only used if this is an operation 
+					op_signed = (input_1_signed || input_2_signed || output_signed);
+					strcpy(sign_char, op_signed ? "S" : "");
+
+
+					if (max_width > input_1_width)
+					{
+						if (input_1_signed)
+							sprintf(operand_a, "{{%d{%s[%d]}}, %s}", max_width - input_1_width, d_list.data_v[i].input_1_name, input_1_width - 1, d_list.data_v[i].input_1_name);
+						else
+							sprintf(operand_a, "{{%d{1'b0}}, %s}", max_width - input_1_width, d_list.data_v[i].input_1_name);
+					}
+					else
+					{
+						sprintf(operand_a, "%s", d_list.data_v[i].input_1_name);
+					}
+					if (found_input2)
+					{
+						if (max_width > input_2_width)
+						{
+							if (input_2_signed)
+								sprintf(operand_b, "{{%d{%s[%d]}}, %s}", max_width - input_2_width, d_list.data_v[i].input_1_name, input_2_width - 1, d_list.data_v[i].input_2_name);
+							else
+								sprintf(operand_b, "{{%d{1'b0}}, %s}", max_width - input_2_width, d_list.data_v[i].input_2_name);
+						}
+						else
+						{
+							sprintf(operand_b, "%s", d_list.data_v[i].input_2_name);
+						}
+					}
+
+					// The wires to not need to use the operand a/b logic
 					if (d_list.data_v[i].is_wire)
 					{
-						char* new_line = new char[81];
 						if (d_list.data_v[i].is_signed && d_list.data_v[i].width>1)
 							sprintf(new_line, "\t wire signed [%d:0] %s;\n", d_list.data_v[i].width - 1, d_list.data_v[i].input_1_name);
 						else if (d_list.data_v[i].is_signed)
@@ -189,45 +281,14 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 							sprintf(new_line, "\t wire %s;\n", d_list.data_v[i].input_1_name);
 
 						fputs(new_line, outputfp);
-						delete[] new_line;
 					}
 					else if (d_list.data_v[i].is_operation)
 					{
-        				int max_width = 0;
+
 	    				comp_op = strstr(d_list.data_v[i].operation_name, "COMP");
 						inc_op = strstr(d_list.data_v[i].operation_name, "INC");
     					dec_op = strstr(d_list.data_v[i].operation_name, "DEC");
-						bool found_input1 = 0;
-						bool found_input2 = 0;
-						bool found_output = 0;
-						// Search for maximum width and signed
-						for (int y = 0; y < i; y++)
-						{
-						    //Width is determined by the size of the outputs only unless comp
-						    //Sign is determined by the inputs only
-							if (!strcmp(d_list.data_v[i].input_1_name, d_list.data_v[y].input_1_name) && i!=y)
-							{
-								if (d_list.data_v[y].width > max_width && comp_op)
-									max_width = d_list.data_v[y].width;
-								if (d_list.data_v[y].is_signed)
-								    d_list.data_v[i].is_signed = 1;
-							    found_input1 = 1;
-							}
-							if (!strcmp(d_list.data_v[i].input_2_name, d_list.data_v[y].input_1_name) && i!=y)
-							{
-								if (d_list.data_v[y].width > max_width && comp_op)
-									max_width = d_list.data_v[y].width;
-								if (d_list.data_v[y].is_signed)
-    							    d_list.data_v[i].is_signed = 1;
-							    found_input2 = 1;
-							}
-							if (!strcmp(d_list.data_v[i].output_name, d_list.data_v[y].input_1_name) && i!=y)
-							{
-								if (d_list.data_v[y].width > max_width)
-									max_width = d_list.data_v[y].width;
-								found_output = 1;
-							}
-						}
+						
 						if(!found_input1 || (!found_input2 && !inc_op && !dec_op) || !found_output){
 						    printf("INPUT/OUTPUT NOT FOUND\n");
 						    exit(EXIT_FAILURE);
@@ -235,7 +296,8 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 						#ifdef DEBUG
 						    printf("Found: I1:%d I2:%d O:%d\n",found_input1,found_input2,found_output);
 					    #endif
-                        d_list.data_v[i].width=max_width;
+
+                        d_list.data_v[i].width=max_width; // is this needed?
 						if(comp_op) // true if this is a compare OP
 						{
 							char op[] = "00";
@@ -247,173 +309,93 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 							if (strstr(comp_op, ">"))
 								strcpy(op, "gt");
 
-							char* new_line = new char[81];
-							char* format_string = new char[81];
-							strncpy(format_string,"\t COMP #(%d) u_COMP%d (%s,%s,.%s(%s));\n",81);
-							if(d_list.data_v[i].is_signed) strncpy(format_string, "\t SCOMP #(%d) s_COMP%d (%s,%s,.%s(%s));\n", 81);
-							sprintf(new_line, format_string,
+
+							sprintf(new_line, "\t %sCOMP #(%d) u_COMP%d (%s,%s,.%s(%s));\n",
+								sign_char,
 								max_width,
 								i,
-								d_list.data_v[i].input_1_name,
-								d_list.data_v[i].input_2_name,
+								operand_a,
+								operand_b,
 								op,
 								d_list.data_v[i].output_name
 							);
 							fputs(new_line, outputfp);
-							delete[] new_line;
-							delete[] format_string;
 
 						}
 						else if (inc_op) // true if this is a INC OP
 						{
-							char* new_line = new char[81];
-							char* format_string = new char[81];
-							strncpy(format_string,"\t INC #(%d) u_INC%d (%s,%s);\n",81);
-							if(d_list.data_v[i].is_signed) strncpy(format_string, "\t SINC #(%d) s_INC%d (%s,%s);\n", 81);
-							sprintf(new_line, format_string,
+
+							sprintf(new_line, "\t %sINC #(%d) u_INC%d (%s,%s);\n",
+								sign_char,
 								max_width,
 								i,
-								d_list.data_v[i].input_1_name,
+								operand_a,
 								d_list.data_v[i].output_name
 							);
 							fputs(new_line, outputfp);
-							delete[] new_line;
-							delete[] format_string;
 
 						}
 						else if (dec_op) // true if this is a DEC OP
 						{
-							char* new_line = new char[81];
-							char* format_string = new char [81];
-							strncpy(format_string, "\t DEC #(%d) u_DEC%d (%s,%s);\n",80);
-							if(d_list.data_v[i].is_signed) strncpy(format_string, "\t SDEC #(%d) s_DEC%d (%s,%s);\n", 81);
-							sprintf(new_line, format_string,
+							sprintf(new_line, "\t %sDEC #(%d) u_DEC%d (%s,%s);\n",
+								sign_char,
 								max_width,
 								i,
-								d_list.data_v[i].input_1_name,
+								operand_a,
 								d_list.data_v[i].output_name
 							);
 							fputs(new_line, outputfp);
-							delete[] new_line;
-							delete[] format_string;
 						}
-						else
+						else // all other operations
 						{
-							char* new_line = new char[81];
-							char* format_string = new char[81];
-							strncpy(format_string,"\t %s #(%d) u_%s%d (%s,%s,%s);\n",81);
-							if(d_list.data_v[i].is_signed) strncpy(format_string, "\t S%s #(%d) s_%s%d (%s,%s,%s);\n", 81);
-							sprintf(new_line, format_string,
+							sprintf(new_line, "\t %s%s #(%d) u_%s%d (%s,%s,%s);\n",
+								sign_char,
 								d_list.data_v[i].operation_name,
 								max_width,
 								d_list.data_v[i].operation_name,
 								i,
-								d_list.data_v[i].input_1_name,
-								d_list.data_v[i].input_2_name,
+								operand_a,
+								operand_b,
 								d_list.data_v[i].output_name
 							);
 							fputs(new_line, outputfp);
-							delete[] new_line;
-							delete[] format_string;
 						}
 					}
 					else if (d_list.data_v[i].is_mux){
-						int max_width = 0;
-						bool found_input1 = 0;
-						bool found_input2 = 0;
-						bool found_select = 0;
-						bool found_output = 0;
-						for (int y = 0; y < i; y++)
-						{
-						    //Width is only based on output size, not input
-							if (!strcmp(d_list.data_v[i].input_1_name, d_list.data_v[y].input_1_name) && i!=y);
-							{
-								if (d_list.data_v[y].is_signed)
-    							    d_list.data_v[i].is_signed = true;
-							    found_input1 = true;
-							}
-							if (!strcmp(d_list.data_v[i].shift_select, d_list.data_v[y].input_1_name) && i!=y);
-							{
-							    found_select = true;
-							}
-							if (!strcmp(d_list.data_v[i].input_2_name, d_list.data_v[y].input_1_name) && i!=y);
-							{
-								if (d_list.data_v[y].is_signed)
-    							    d_list.data_v[i].is_signed = true;
-							    found_input2 = true;
-							}
-							if (!strcmp(d_list.data_v[i].output_name, d_list.data_v[y].input_1_name) && i!=y)
-							{
-								if (d_list.data_v[y].width > max_width)
-									max_width = d_list.data_v[y].width;
-                                found_output=true;
-							}
-						}
-						if(!(found_input1 && found_input2 && found_output && found_select)){
-						    printf("INPUT/OUTPUT NOT FOUND");
-						    exit(EXIT_FAILURE);
-						}
                         d_list.data_v[i].width=max_width;
 
-						char* new_line = new char[81];
-					    char* format_string = new char[81];
-						strncpy(format_string,"\t MUX2x1 #(%d) u_MUX2x1%d (%s,%s,%s,%s);\n",81);
-						if(d_list.data_v[i].is_signed) strncpy(format_string, "\t SMUX2x1 #(%d) s_MUX2x1%d (%s,%s,%s,%s);\n", 81);
-						sprintf(new_line, format_string,
+
+						sprintf(new_line, "\t %sMUX2x1 #(%d) u_MUX2x1%d (%s,%s,%s,%s);\n",
+							sign_char,
 							max_width,
 							i,
-							d_list.data_v[i].input_1_name,
-							d_list.data_v[i].input_2_name,
+							operand_a,
+							operand_b,
 							d_list.data_v[i].shift_select,
 							d_list.data_v[i].output_name
 						);
 						fputs(new_line, outputfp);
-						delete[] new_line;
-						delete[] format_string;
+
 					}
 					else if (d_list.data_v[i].is_assignment)
 					{
-						int max_width = 0;
-						bool found_input1 = 0;
-						bool found_output = 0;
-						// Search for maximum width and signed
-						for (int y = 0; y < i; y++)
-						{
-						    //Width is only based on output size, not input
-							if (!strcmp(d_list.data_v[i].input_1_name, d_list.data_v[y].input_1_name) && i!=y)
-							{
-								/*if (d_list.data_v[y].width > max_width)
-									max_width = d_list.data_v[y].width;*/
-								if (d_list.data_v[y].is_signed)
-    							    d_list.data_v[i].is_signed = 1;
-							    found_input1=1;
-							}
-							if (!strcmp(d_list.data_v[i].output_name, d_list.data_v[y].input_1_name) && i!=y)
-							{
-								if (d_list.data_v[y].width > max_width)
-									max_width = d_list.data_v[y].width;
-								found_output=1;
-							}
-						}
-						if(!(found_input1 && found_output)){
-						    printf("INPUT/OUTPUT NOT FOUND");
-						    exit(EXIT_FAILURE);
-						}
+
                         d_list.data_v[i].width=max_width;
-						char* new_line = new char[81];
-						char* format_string = new char[81];
-						strncpy(format_string,"\t REG #(%d) u_REG%d (%s,clk,rst,%s);\n",81);
-						if(d_list.data_v[i].is_signed) strncpy(format_string, "\t SREG #(%d) s_REG%d (%s,clk,rst,%s);\n", 81);
-						sprintf(new_line, format_string,
+
+						sprintf(new_line, "\t %sREG #(%d) u_REG%d (%s,clk,rst,%s);\n",
+							sign_char,
 							max_width,
 							i,
-							d_list.data_v[i].input_1_name,
+							operand_a,
 							d_list.data_v[i].output_name
 						);
 						fputs(new_line, outputfp);
-						delete[] new_line;
-						delete[] format_string;
 					}
+
+					delete[] new_line;
+					delete[] sign_char;
+					delete[] operand_a;
+					delete[] operand_b;
 				}
 			}
 			else
