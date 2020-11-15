@@ -378,9 +378,22 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
                             fputs(new_line, outputfp);
                         }
                     }
-                    else if (d_list.data_v[i].is_mux){
+                    else if (d_list.data_v[i].is_mux)
+                    {
                         d_list.data_v[i].width= output_width;
+                        bool found_select = 0;
+                        // locally Assign widths to all inputs/outputs
+                        for (int y = 0; y < d_list.count; y++)
+                        {
 
+                            if (d_list.data_v[i].shift_select) //check for null
+                            {
+                                if (!strcmp(d_list.data_v[i].shift_select, d_list.data_v[y].input_1_name))
+                                {
+                                    found_select = 1;
+                                }
+                            }
+                        }
 
                         sprintf(new_line, "\t %sMUX2x1 #(%d) u_MUX2x1%d (%s,%s,%s,%s);\n",
                             sign_char,
@@ -392,7 +405,11 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
                             d_list.data_v[i].output_name
                         );
                         fputs(new_line, outputfp);
-
+                        if (!(found_input1 && found_input2 && found_output && found_select))
+                        {
+                            printf("INPUT/OUTPUT NOT FOUND");
+                            exit(EXIT_FAILURE);
+                        }
                     }
                     else if (d_list.data_v[i].is_assignment)
                     {
@@ -406,6 +423,13 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
                             operand_a,
                             d_list.data_v[i].output_name
                         );
+
+                        if (!found_input1 || !found_output) 
+                        {
+                            printf("INPUT/OUTPUT NOT FOUND\n");
+                            exit(EXIT_FAILURE);
+                        }
+
                         fputs(new_line, outputfp);
                     }
 
