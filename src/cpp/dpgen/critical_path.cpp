@@ -26,7 +26,7 @@ void TopSortVisit(data_list * Graph, data_list * List, data_type uVertex) {
 	uVertex.color = "Gray";
 	for (int i = 0; i<Graph->data_v.size(); i++) {
 		if (Graph->data_v[i].is_operation || Graph->data_v[i].is_mux) {
-			if (!uVertex.is_operation && !uVertex.is_output) {
+			if (!uVertex.is_operation && !uVertex.is_output && !uVertex.is_mux) {
 				if ((strcmp(uVertex.input_1_name, Graph->data_v[i].input_1_name) == 0 ||
 					strcmp(uVertex.input_1_name, Graph->data_v[i].input_2_name) == 0)) {
 					if (Graph->data_v[i].color == "White") {
