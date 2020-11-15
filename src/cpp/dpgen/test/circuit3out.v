@@ -40,17 +40,17 @@ module circuit3(
 	 wire signed [31:0] l2div2;
 	 wire signed [31:0] l2div4;
 	 wire signed [31:0] l2div8;
-	 SADD #(32) s_ADD20 (a,b,l00);
-	 SADD #(32) s_ADD21 (c,d,l01);
-	 SADD #(32) s_ADD22 (e,f,l02);
-	 SADD #(32) s_ADD23 (g,h,l03);
-	 SADD #(32) s_ADD24 (l00,l01,l10);
-	 SADD #(32) s_ADD25 (l02,l03,l11);
-	 SADD #(32) s_ADD26 (l10,l11,l2);
-	 SSHR #(32) s_SHR27 (l2,sa,l2div2);
-	 SSHR #(32) s_SHR28 (l2div2,sa,l2div4);
-	 SSHR #(32) s_SHR29 (l2div4,sa,l2div8);
-	 SREG #(16) s_REG30 (l2div8,clk,rst,avg);
+	 SADD #(32) u_ADD20 ({{16{a[15]}}, a},{{16{b[15]}}, b},l00);
+	 SADD #(32) u_ADD21 ({{16{c[15]}}, c},{{16{d[15]}}, d},l01);
+	 SADD #(32) u_ADD22 ({{16{e[15]}}, e},{{16{f[15]}}, f},l02);
+	 SADD #(32) u_ADD23 ({{16{g[15]}}, g},{{16{h[15]}}, h},l03);
+	 SADD #(32) u_ADD24 (l00,l01,l10);
+	 SADD #(32) u_ADD25 (l02,l03,l11);
+	 SADD #(32) u_ADD26 (l10,l11,l2);
+	 SSHR #(32) u_SHR27 (l2,{{24{sa[7]}}, sa},l2div2);
+	 SSHR #(32) u_SHR28 (l2div2,{{24{sa[7]}}, sa},l2div4);
+	 SSHR #(32) u_SHR29 (l2div4,{{24{sa[7]}}, sa},l2div8);
+	 SREG #(16) u_REG30 (l2div8[15:0],clk,rst,avg);
 
 
 endmodule

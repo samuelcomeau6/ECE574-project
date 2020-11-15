@@ -13,32 +13,20 @@
 // *********************************************************************************
 // *********************************************************************************
 
-module error2(
+module error3(
 
 	 input clk,
 	 input rst,
-	 input [7:0] a,
-	 input [7:0] b,
-	 input [7:0] c,
+	 input signed [7:0] a,
+	 input signed [7:0] b,
 
-	 output [7:0] z,
-	 output [15:0] x
+	 output signed [7:0] z,
+	 output signed [15:0] x
 );
 
-	 wire [7:0] e;
-	 wire [15:0] f;
-	 wire [15:0] g;
-	 wire [15:0] xwire;
-	 ADD #(0) u_ADD9 (a,b,d);
-	 ADD #(0) u_ADD10 (a,c,e);
-	 COMP> #(0) u_COMP>11 (d,e,g);
-	 MUL #(0) u_MUL13 (a,c,f);
-	 SUB #(0) u_SUB14 (f,d,xwire);
-	 assign x = xwire;
-
-
-endmodule
-
-// *********************************************************************************
-// *                            END OF GENERATED FILE                              *
-// *********************************************************************************
+	 wire signed [7:0] d;
+	 wire signed [7:0] e;
+	 wire signed [15:0] f;
+	 wire signed [15:0] g;
+	 wire signed [15:0] xwire;
+	 SADD #(8) u_ADD9 (a,b,d);

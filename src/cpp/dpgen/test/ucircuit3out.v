@@ -24,7 +24,7 @@ module ucircuit3(
 );
 
 	 wire [7:0] cwire;
-	 ADD #(8) u_ADD4 (a,b,cwire);
+	 ADD #(8) u_ADD4 (a[7:0],b[7:0],cwire);
 	 REG #(8) u_REG5 (cwire,clk,rst,c);
 
 

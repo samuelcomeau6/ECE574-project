@@ -24,7 +24,7 @@ module ucircuit2(
 );
 
 	 wire [31:0] cwire;
-	 ADD #(32) u_ADD4 (a,b,cwire);
+	 ADD #(32) u_ADD4 ({{24{1'b0}}, a},{{16{1'b0}}, b},cwire);
 	 REG #(32) u_REG5 (cwire,clk,rst,c);
 
 

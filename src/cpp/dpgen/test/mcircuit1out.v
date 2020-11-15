@@ -24,8 +24,8 @@ module mcircuit1(
 );
 
 	 wire signed [7:0] cwire;
-	 SADD #(8) s_ADD4 (a,b,cwire);
-	 SREG #(8) s_REG5 (cwire,clk,rst,c);
+	 SADD #(8) u_ADD4 (a,b,cwire);
+	 SREG #(8) u_REG5 (cwire,clk,rst,c);
 
 
 endmodule

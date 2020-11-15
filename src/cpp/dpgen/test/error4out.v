@@ -17,28 +17,21 @@ module error4(
 
 	 input clk,
 	 input rst,
-	 input [7:0] a,
-	 input [7:0] b,
-	 input [7:0] c,
+	 input signed [7:0] a,
+	 input signed [7:0] b,
+	 input signed [7:0] c,
 
-	 output [7:0] z
+	 output signed [7:0] z
 );
 
-	 wire [7:0] d;
-	 wire [7:0] e;
-	 wire [15:0] f;
-	 wire [15:0] g;
-	 wire [15:0] xwire;
-	 ADD #(0) u_ADD9 (a,b,d);
-	 ADD #(0) u_ADD10 (a,c,e);
-	 COMP> #(0) u_COMP>11 (d,e,g);
-	 MUL #(0) u_MUL13 (a,c,f);
-	 SUB #(0) u_SUB14 (f,d,xwire);
-	 assign x = xwire;
-
-
-endmodule
-
-// *********************************************************************************
-// *                            END OF GENERATED FILE                              *
-// *********************************************************************************
+	 wire signed [7:0] d;
+	 wire signed [7:0] e;
+	 wire signed [15:0] f;
+	 wire signed [15:0] g;
+	 wire signed [15:0] xwire;
+	 SADD #(8) u_ADD9 (a,b,d);
+	 SADD #(8) u_ADD10 (a,c,e);
+	 SCOMP #(8) u_COMP11 (d,e,.gt(g));
+	 SMUX2x1 #(8) u_MUX2x112 (d,e,g,z);
+	 SMUL #(16) u_MUL13 ({{8{a[7]}}, a},{{8{c[7]}}, c},f);
+	 SSUB #(16) u_SUB14 (f,{{8{d[7]}}, d},xwire);
