@@ -140,7 +140,7 @@ float LongestPath(data_list * Graph) {
 					pathDur = List.data_v[i].duration + pathDur;
 					//Node tracker vector
 					nodeCollect.push_back(List.data_v[i].operation_name);
-					Graph->data_v[i].color == "Black";
+					Graph->data_v[i].color = "Black";
 					#ifdef DEBUG
 					printf("Path duration after i:%d:%s:%f is %fns\n", i, List.data_v[i].operation_name, List.data_v[i].duration, pathDur);
 					#endif

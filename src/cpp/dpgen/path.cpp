@@ -75,7 +75,7 @@ namespace path{
         temp_obj.input_1_name = new char[name.size() + 1];
         strcpy(temp_obj.input_1_name, name.c_str());
         temp_obj.input_2_name   = 0;
-        temp_obj.shift_select   = "Null";
+        temp_obj.shift_select   = 0;
         temp_obj.output_name    = 0;
         temp_obj.operation_name = new char[operation_toString(component_type).size() + 1];
         strcpy(temp_obj.operation_name, operation_toString(component_type).c_str());
@@ -106,7 +106,7 @@ namespace path{
         data_type temp_obj;
         temp_obj.input_1_name = new char[input1.size() + 1];
         temp_obj.input_2_name = new char[input2.size() + 1];
-        temp_obj.shift_select   = "Null";
+        temp_obj.shift_select   = 0;
         temp_obj.output_name = new char[output.size() + 1];
         temp_obj.operation_name = new char[operation_toString(component_type).size() + 1];
         strcpy(temp_obj.input_1_name, input1.c_str());
@@ -175,7 +175,7 @@ namespace path{
         strcpy(temp_obj.output_name, left.c_str());
         strcpy(temp_obj.input_1_name, right.c_str());
         temp_obj.input_2_name = 0;
-        temp_obj.shift_select   = "NULL";
+        temp_obj.shift_select   = 0;
         temp_obj.operation_name = new char[operation_toString(parse::REG).size() + 1];
         strcpy(temp_obj.operation_name, operation_toString(parse::REG).c_str());
         temp_obj.is_input = false;
