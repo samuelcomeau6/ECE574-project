@@ -79,8 +79,9 @@ namespace parse{
             if(matches[1]=="wire") component=WIRE;
 
             if(matches[2]=="Int") data_signed=1;
-            if(matches[2]=="UInt") data_signed=0;
+            if (matches[2] == "UInt") data_signed = 0;
             data_width = stoi(matches[3]);
+            if (data_width == 1) data_signed = 0;
 
             for (size_t i = 4; i < matches.size(); ++i){
                 if(matches[i]!=""){

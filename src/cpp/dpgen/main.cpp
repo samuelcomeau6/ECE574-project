@@ -171,6 +171,7 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
                 char* comp_op;
                 char* inc_op;
                 char* dec_op;
+                char* shift_op;
 
                 //loop through all objects
                 for (int i = 0; i < d_list.count; i++)
@@ -178,6 +179,7 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
                     int   input_1_width = 0;
                     int   input_2_width = 0;
                     int   output_width = 0;
+                    int   comp_width = 0;
                     bool  input_1_signed = false;
                     bool  input_2_signed = false;
                     bool  output_signed = false;
@@ -200,7 +202,7 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
                     for (int y = 0; y < d_list.count; y++)
                     {
                         //we are only looking for objects that are inputs or outputs or wires
-                        if (!(d_list.data_v[y].is_input || d_list.data_v[y].is_output || d_list.data_v[y].is_wire))
+                        if (!(d_list.data_v[y].is_input || d_list.data_v[y].is_output || d_list.data_v[y].is_wire || d_list.data_v[y].is_reg))
                             continue;
 
                         //Width is determined by the size of the outputs only unless comp
@@ -234,6 +236,13 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
                         }
                     }
 
+                    if(input_1_width > input_2_width)
+                        comp_width = input_1_width;
+                    else
+                        comp_width = input_2_width;
+
+                    if (d_list.data_v[i].operation_name && strstr(d_list.data_v[i].operation_name, "COMP"))
+                        output_width = comp_width;
 
                     // deterine if this operation is signed, only used if this is an operation 
                     op_signed = (input_1_signed || input_2_signed || output_signed);
@@ -261,7 +270,7 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
                         if (output_width > input_2_width)
                         {
                             if (input_2_signed)
-                                sprintf(operand_b, "{{%d{%s[%d]}}, %s}", output_width - input_2_width, d_list.data_v[i].input_1_name, input_2_width - 1, d_list.data_v[i].input_2_name);
+                                sprintf(operand_b, "{{%d{%s[%d]}}, %s}", output_width - input_2_width, d_list.data_v[i].input_2_name, input_2_width - 1, d_list.data_v[i].input_2_name);
                             else
                                 sprintf(operand_b, "{{%d{1'b0}}, %s}", output_width - input_2_width, d_list.data_v[i].input_2_name);
                         }
@@ -276,7 +285,7 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
                     }
 
                     // The wires to not need to use the operand a/b logic
-                    if (d_list.data_v[i].is_wire)
+                    if (d_list.data_v[i].is_wire || d_list.data_v[i].is_reg)
                     {
                         if (d_list.data_v[i].is_signed && d_list.data_v[i].width>1)
                             sprintf(new_line, "\t wire signed [%d:0] %s;\n", d_list.data_v[i].width - 1, d_list.data_v[i].input_1_name);
@@ -295,7 +304,8 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
                         comp_op = strstr(d_list.data_v[i].operation_name, "COMP");
                         inc_op = strstr(d_list.data_v[i].operation_name, "INC");
                         dec_op = strstr(d_list.data_v[i].operation_name, "DEC");
-                        
+                        //shift_op = strstr(d_list.data_v[i].operation_name, "SH");
+
                         if(!found_input1 || (!found_input2 && !inc_op && !dec_op) || !found_output){
                             printf("INPUT/OUTPUT NOT FOUND\n");
                             exit(EXIT_FAILURE);
@@ -319,7 +329,7 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
 
                             sprintf(new_line, "\t %sCOMP #(%d) u_COMP%d (%s,%s,.%s(%s));\n",
                                 sign_char,
-                                output_width,
+                                comp_width,
                                 i,
                                 operand_a,
                                 operand_b,
