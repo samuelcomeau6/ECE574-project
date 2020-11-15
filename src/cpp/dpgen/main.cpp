@@ -307,7 +307,7 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
                         //shift_op = strstr(d_list.data_v[i].operation_name, "SH");
 
                         if(!found_input1 || (!found_input2 && !inc_op && !dec_op) || !found_output){
-                            printf("INPUT/OUTPUT NOT FOUND\n");
+                            printf("Operator INPUT/OUTPUT NOT FOUND\n");
                             exit(EXIT_FAILURE);
                         }
                         #ifdef DEBUG
@@ -407,7 +407,7 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
                         fputs(new_line, outputfp);
                         if (!(found_input1 && found_input2 && found_output && found_select))
                         {
-                            printf("INPUT/OUTPUT NOT FOUND");
+                            printf("Mux INPUT/OUTPUT NOT FOUND");
                             exit(EXIT_FAILURE);
                         }
                     }
@@ -424,9 +424,9 @@ int create_v_file(const char* template_file, char* output_file, char* module_nam
                             d_list.data_v[i].output_name
                         );
 
-                        if (!found_input1 || !found_output) 
+                        if (!found_input1 || !found_output)
                         {
-                            printf("INPUT/OUTPUT NOT FOUND\n");
+                            printf("REG INPUT/OUTPUT NOT FOUND\n");
                             exit(EXIT_FAILURE);
                         }
 
