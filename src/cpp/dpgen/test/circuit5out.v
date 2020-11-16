@@ -31,12 +31,12 @@ module circuit5(
 	 wire signed [63:0] g;
 	 wire signed [63:0] zwire;
 	 wire gEQz;
-	 SDIV #(64) s_DIV11 (a,b,e);
-	 SDIV #(64) s_DIV12 (c,d,f);
-	 SMOD #(64) s_MOD13 (a,b,g);
-	 SCOMP #(64) s_COMP14 (g,zero,.eq(gEQz));
-	 SMUX2x1 #(64) s_MUX2x115 (e,f,gEQz,zwire);
-	 SREG #(64) s_REG16 (zwire,clk,rst,z);
+	 SDIV #(64) u_DIV11 (a,b,e);
+	 SDIV #(64) u_DIV12 (c,d,f);
+	 SMOD #(64) u_MOD13 (a,b,g);
+	 SCOMP #(64) u_COMP14 (g,zero,.eq(gEQz));
+	 SMUX2x1 #(64) u_MUX2x115 (e,f,gEQz,zwire);
+	 SREG #(64) u_REG16 (zwire,clk,rst,z);
 
 
 endmodule

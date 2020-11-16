@@ -1,7 +1,6 @@
 echo "This will replace the test cases with the program's output."
 read -p "Are you sure? " -n 1 -r
 echo    # (optional) move to a new line
-if [[ ! $REPLY =~ ^[Yy]$ ]]
 if [[  $REPLY =~ ^[Yy]$ ]]
 then
     for i in {1..6};do

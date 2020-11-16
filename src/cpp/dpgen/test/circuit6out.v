@@ -30,12 +30,12 @@ module circuit6(
 	 wire signed [63:0] g;
 	 wire signed [63:0] zwire;
 	 wire gEQz;
-	 SDEC #(64) s_DEC10 (a,e);
-	 SINC #(64) s_INC11 (c,f);
-	 SMOD #(64) s_MOD12 (a,c,g);
-	 SCOMP #(64) s_COMP13 (g,zero,.eq(gEQz));
-	 SMUX2x1 #(64) s_MUX2x114 (e,f,gEQz,zwire);
-	 SREG #(64) s_REG15 (zwire,clk,rst,z);
+	 SDEC #(64) u_DEC10 (a,e);
+	 SINC #(64) u_INC11 (c,f);
+	 SMOD #(64) u_MOD12 (a,c,g);
+	 SCOMP #(64) u_COMP13 (g,zero,.eq(gEQz));
+	 SMUX2x1 #(64) u_MUX2x114 (e,f,gEQz,zwire);
+	 SREG #(64) u_REG15 (zwire,clk,rst,z);
 
 
 endmodule

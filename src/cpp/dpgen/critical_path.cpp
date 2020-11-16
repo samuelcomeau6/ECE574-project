@@ -25,25 +25,18 @@ void TopSortVisit(data_list * Graph, data_list * List, data_type uVertex) {
 
 	uVertex.color = "Gray";
 	for (int i = 0; i<Graph->data_v.size(); i++) {
-		if (Graph->data_v[i].is_operation || Graph->data_v[i].is_mux == 1) {
-			if (!uVertex.is_operation && !uVertex.is_output) {
+		if (Graph->data_v[i].is_operation || Graph->data_v[i].is_mux) {
+			if (!uVertex.is_operation && !uVertex.is_output && !uVertex.is_mux) {
 				if ((strcmp(uVertex.input_1_name, Graph->data_v[i].input_1_name) == 0 ||
-					strcmp(uVertex.input_1_name, Graph->data_v[i].input_2_name) == 0) && (uVertex.input_2_name == NULL)) {
+					strcmp(uVertex.input_1_name, Graph->data_v[i].input_2_name) == 0)) {
 					if (Graph->data_v[i].color == "White") {
 						if ((strcmp(Graph->data_v[i].operation_name, "REG") != 0)) {
+						    //Not a register
 							List->data_v.push_back(Graph->data_v[i]);
 							#ifdef DEBUG
-							printf("Added #%d:%s\n", i, Graph->data_v[i].operation_name);
+							    printf("Added #%d:%s\n", i, Graph->data_v[i].operation_name);
 							#endif
 							TopSortVisit(Graph, List, Graph->data_v[i]);
-						}
-						else if (strcmp(Graph->data_v[i].operation_name, "REG") == 0) {
-							Graph->data_v[i].color = "Black";
-							List->data_v.push_back(Graph->data_v[i]);
-							return;
-							#ifdef DEBUG
-							printf("Added #%d:%s\n", i, Graph->data_v[i].operation_name);
-							#endif
 						}
 					}
 					Graph->data_v[i].color = "Black";
@@ -62,14 +55,6 @@ void TopSortVisit(data_list * Graph, data_list * List, data_type uVertex) {
 							Graph->data_v[i].color = "Black";
 							TopSortVisit(Graph, List, Graph->data_v[i]);
 						}
-						else if (strcmp(Graph->data_v[i].operation_name, "REG") == 0) {
-							Graph->data_v[i].color = "Black";
-							List->data_v.push_back(Graph->data_v[i]);
-							return;
-							#ifdef DEBUG
-							printf("Added #%d:%s\n", i, Graph->data_v[i].operation_name);
-							#endif
-						}
 					}
 					Graph->data_v[i].color = "Black";
 				}
@@ -79,7 +64,16 @@ void TopSortVisit(data_list * Graph, data_list * List, data_type uVertex) {
 			}
 
 		}
-		else {
+		else if (Graph->data_v[i].is_assignment && Graph->data_v[i].color == "White") {
+		    //Is a register
+			Graph->data_v[i].color = "Black";
+			List->data_v.push_back(Graph->data_v[i]);
+			#ifdef DEBUG
+			    printf("Added #%d:%s\n", i, Graph->data_v[i].operation_name);
+			#endif
+			return;
+		}
+        else{
 			continue;
 		}
 	}
