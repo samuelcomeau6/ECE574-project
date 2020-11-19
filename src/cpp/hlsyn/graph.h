@@ -35,13 +35,21 @@ struct node_struct{
 };
 typedef struct node_struct node_t;
 
-typedef struct
-{
-	node_t inop;
-	node_t onop;
-	std::vector<node_t> nodes;
-	std::vector<edge_t> edges;
+class Graph{
+    public:
+        node_t inop;
+        node_t onop;
+    	std::vector<node_t *> nodes;
+    	std::vector<edge_t *> edges;
+        void add_node(comp_t component_type, std::string input1_name, std::string input2_name, std::string select, std::string output_name);
+        void add_edge(comp_t component_type, std::string name, int data_width, bool is_signed);
+        edge_t * copy_edge(edge_t edge);
+        std::string graph_toString();
+};
 
-} graph_t;
-
+std::string node_toString(node_t datum);
+std::string edge_toString(edge_t datum);
+edge_t* edge_search(Graph * list, std::string name,bool is_from);
+int max(int a, int b, int c);
+std::string comp_toString(comp_t component);
 #endif

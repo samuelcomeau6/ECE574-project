@@ -20,7 +20,7 @@ using namespace std;
 
 /* parse_line
 */
-std::string parse_line(string line, graph_t * list){
+std::string parse_line(string line, Graph * list){
     int data_width;
     bool data_signed=0;
     comp_t component=ERR;
@@ -105,7 +105,7 @@ void close(ifstream * file){
 /* parse
     implements other functions to return a completed netlist type
 */
-void parse(std::string filename, graph_t * list){
+void parse(std::string filename, Graph * list){
     ifstream netlist(filename, std::ios::in);
     std::string out;
     while(!netlist.eof()){

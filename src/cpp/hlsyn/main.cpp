@@ -14,8 +14,9 @@ int main(int argc, char * argv[]){
     std::string input_filename(argv[1]);
     int latency = atoi(argv[2]); //TODO error checking
     std::string output_filename(argv[3]);
-    graph_t graph;
-    graph.inop.name = "inop";
-    graph.onop.name = "onop";
-    parse(input_filename, &graph);
+    Graph g;
+    g.inop.name = "inop";
+    g.onop.name = "onop";
+    parse(input_filename, &g);
+    std::cout << g.graph_toString();
 }
