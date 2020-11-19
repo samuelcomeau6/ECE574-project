@@ -1,36 +1,7 @@
 /*
 parse.cpp
 
-This is the circuit parser for ece574 project assignment2 u of arizona.
-
 Created by Samuel Comeau
-
-Input:
-    a file of c like statements with the following conventions:
-
-    -all empty lines are ignored
-    -all lines beginning with "//" are ignored
-    -netlist file is fully space/tab delimited
-    -circuit input and outputs are declared on a line using:
-        input datatType inputName1, inputName2
-        output dataType outputName1, outputName2
-    -valid datatType:
-        Int1,Int2,Int8,Int32,Int64
-        Uint1,
-    -all outputs are implicitly associated with a register component
-    -interal registers are explicityly declared:
-        register dataType regName1, regName2
-    -wires are explicitly declared:
-        wire dataType wireName1, wireName2
-    -width of components should be determined by the size of the output
-    -signed integer inputs should be sign extended
-    -unsigned integer inputs should be 0 padded
-    -width of comparators should be deteremined by the size of the largest input
-    -assignment to a register is input to register
-    -operations on  a register use the register output
-    -all names should be unique
-    -all names are case sensitive
-    -input, output, wires, reg declarations should come before components
 */
 #include <iostream>
 #include <fstream>
@@ -47,17 +18,6 @@ using namespace std;
                    "(?:,\\W+(\\w+))?(?:,\\W+(\\w+))?(?:,\\W+(\\w+))?"\
                    "(?:,\\W+(\\w+))?"
 
-
-/* get_line
-    Recieves an opened netlist file and returns the next line as a string
-*/
-std::string get_line(ifstream * file){
-    std::string nextline;
-    getline(*file, nextline);
-    return nextline;
-}
-
-
 /* parse_line
 */
 std::string parse_line(string line, graph_t * list){
@@ -65,7 +25,7 @@ std::string parse_line(string line, graph_t * list){
     bool data_signed=0;
     comp_t component=ERR;
     //Check for data types
-    std::regex data_regex("(input|output|register|wire)"
+    std::regex data_regex("(input|output|variable)"
                            "\\W+?(Int|UInt)(\\d+)\\W+(\\w+)"
                            TEN_WORD_REGEX,
                            std::regex_constants::ECMAScript);
@@ -74,8 +34,7 @@ std::string parse_line(string line, graph_t * list){
     if(std::regex_search(line, matches, data_regex)){
         if(matches[1]=="input") component=INPUT;
         if(matches[1]=="output") component=OUTPUT;
-        if(matches[1]=="register") component=REG;
-        if(matches[1]=="wire") component=WIRE;
+        if(matches[1]=="variable") component=VAR;
 
         if(matches[2]=="Int") data_signed=1;
         if (matches[2] == "UInt") data_signed = 0;
@@ -150,7 +109,9 @@ void parse(std::string filename, graph_t * list){
     ifstream netlist(filename, std::ios::in);
     std::string out;
     while(!netlist.eof()){
-        out = parse_line(get_line(&netlist), list);
+        std::string nextline;
+        getline(netlist, nextline);
+        out = parse_line(nextline, list);
         #ifdef DEBUG
             std::cout << out << std::endl;
         #endif

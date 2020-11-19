@@ -27,13 +27,14 @@ std::string comp_toString(comp_t component) {
     case INPUT:   output = "INPUT"; break;
     case OUTPUT:  output = "OUTPUT"; break;
     case WIRE:    output = "WIRE"; break;
+    case VAR:    output = "VAR"; break;
     default:      output = "ERROR"; break;
     }
     return output;
 }
 
 
-std::string node_toString(data_t datum){
+std::string node_toString(node_t datum){
     std::string out_string = datum.name;
     if(datum.is_signed) out_string = out_string + " signed ";
     else out_string = out_string + " unsigned ";
@@ -41,25 +42,50 @@ std::string node_toString(data_t datum){
     out_string = out_string + comp_toString(datum.type);
     out_string = out_string + " Input1:";
     if(datum.input_1==NULL) out_string = out_string + "NULL";
-    else if(datum.input_1->name=="inop") out_string = out_string + "INOP";
     else out_string = out_string + datum.input_1->name;
     out_string = out_string + " Input2:";
     if(datum.input_2==NULL) out_string = out_string + "NULL";
-    else if(datum.input_2->name=="inop") out_string = out_string + "INOP";
     else out_string = out_string + datum.input_2->name;
     if(datum.type==MUX2X1){
         out_string = out_string + " Select:"+datum.select->name;
     }
     out_string = out_string + " Output:";
     if(datum.output==NULL) out_string = out_string + "NULL";
-    else if(datum.output->name=="onop") out_string = out_string + "ONOP";
     else out_string = out_string + datum.output->name;
     return out_string;
 }
-data_t* list_search(graph_t * list, std::string name){
-    for(int i=0;i<=list->count;++i){
-        if(list->data_v[i].name == name) {
-            return &list->data_v[i];
+std::string edge_toString(edge_t datum){
+    std::string out_string = datum.name;
+    if(datum.is_signed) out_string = out_string + " signed ";
+    else out_string = out_string + " unsigned ";
+    out_string = out_string + std::to_string(datum.width) + " bit ";
+    out_string = out_string + comp_toString(datum.type);
+    out_string = out_string + " From:";
+    if(datum.from==NULL) out_string = out_string + "NULL";
+    else out_string = out_string + datum.from->name;
+    out_string = out_string + " To:";
+    if(datum.to==NULL) out_string = out_string + "NULL";
+    else out_string = out_string + datum.to->name;
+    return out_string;
+}
+edge_t* edge_search(graph_t * list, std::string name,bool is_from){
+    for(int i=0;i<=list->edges.size();++i){
+        if(list->edges[i].name == name) {
+            if(is_from){
+                if(list->edges[i].from != NULL){
+                    fprintf(stderr,"Signal %s is driven from multiple sources",
+                            list->edges[i].name.c_str());
+                    exit(EXIT_FAILURE);
+                } else {
+                    return &list->edges[i];
+                }
+            } else {
+                if(list->edges[i].to==NULL){
+                    return &list->edges[i];
+                } else {
+                    //TODO make a copy
+                }
+            }
         }
     }
     return NULL;
@@ -73,25 +99,22 @@ int max(int a, int b, int c){
 
 void add_data(comp_t component_type, std::string name, int data_width, bool is_signed, graph_t * list){
 
-    data_t temp_obj;
+    edge_t temp_obj;
     temp_obj.name           = name;
-    if(component_type==INPUT) temp_obj.input_1 = &list->inop;
-    else temp_obj.input_1        = NULL;
-    if(component_type==OUTPUT) temp_obj.output = &list->onop;
-    else temp_obj.output         = NULL;
-    temp_obj.input_2        = NULL;
-    temp_obj.select   = NULL;
+    if(component_type==INPUT) temp_obj.from = &list->inop;
+    else temp_obj.from        = NULL;
+    if(component_type==OUTPUT) temp_obj.to = &list->onop;
+    else temp_obj.to         = NULL;
     temp_obj.type           = component_type;
     temp_obj.is_signed      = is_signed;
     temp_obj.width          = data_width;
 	temp_obj.color 		    = "White";
 
-    list->count++;
-    list->data_v.push_back(temp_obj);
+    list->edges.push_back(temp_obj);
 
     #ifdef DEBUG
         std::cout << "New data: ";
-        std::cout << node_toString(temp_obj) << std::endl;
+        std::cout << edge_toString(temp_obj) << std::endl;
     #endif
 
 }
@@ -99,12 +122,12 @@ void add_op(comp_t component_type, std::string input1_name, std::string input2_n
     bool is_signed = 0;
     int data_width = 0;
 
-    data_t temp_obj;
-    temp_obj.name           = comp_toString(component_type)+std::to_string(list->count);
-    temp_obj.input_1        = list_search(list, input1_name);
-    temp_obj.input_2        = list_search(list, input2_name);
-    temp_obj.output         = list_search(list, output_name);
-    temp_obj.select   = NULL;
+    node_t temp_obj;
+    temp_obj.name           = comp_toString(component_type)+std::to_string(list->nodes.size());
+    temp_obj.input_1        = edge_search(list, input1_name, false);
+    temp_obj.input_2        = edge_search(list, input2_name, false);
+    temp_obj.output         = edge_search(list, output_name, true);
+    temp_obj.select         = NULL;
     temp_obj.type           = component_type;
     temp_obj.is_signed      = (temp_obj.input_1->is_signed
                                ||temp_obj.input_2->is_signed
@@ -114,8 +137,7 @@ void add_op(comp_t component_type, std::string input1_name, std::string input2_n
                                   temp_obj.input_1->width);
 	temp_obj.color 		    = "White";
 
-    list->count++;
-    list->data_v.push_back(temp_obj);
+    list->nodes.push_back(temp_obj);
 
     #ifdef DEBUG
         std::cout << "New operation: ";
@@ -125,12 +147,12 @@ void add_op(comp_t component_type, std::string input1_name, std::string input2_n
 }
 void add_mux(std::string select_name, std::string is_true, std::string is_false, std::string output_name, graph_t * list){
 
-    data_t temp_obj;
-    temp_obj.name           = comp_toString(MUX2X1)+std::to_string(list->count);
-    temp_obj.input_1        = list_search(list, is_true);
-    temp_obj.input_2        = list_search(list, is_false);
-    temp_obj.output         = list_search(list, output_name);
-    temp_obj.select   = list_search(list, select_name);
+    node_t temp_obj;
+    temp_obj.name           = comp_toString(MUX2X1)+std::to_string(list->nodes.size());
+    temp_obj.input_1        = edge_search(list, is_true, false);
+    temp_obj.input_2        = edge_search(list, is_false, false);
+    temp_obj.output         = edge_search(list, output_name, true);
+    temp_obj.select   = edge_search(list, select_name, false);
     temp_obj.type           = MUX2X1;
     temp_obj.is_signed      = (temp_obj.input_1->is_signed
                                ||temp_obj.input_2->is_signed
@@ -140,8 +162,7 @@ void add_mux(std::string select_name, std::string is_true, std::string is_false,
                                   temp_obj.input_1->width);
 	temp_obj.color 		    = "White";
 
-    list->count++;
-    list->data_v.push_back(temp_obj);
+    list->nodes.push_back(temp_obj);
 
     #ifdef DEBUG
         std::cout << "New mux: ";
@@ -150,12 +171,12 @@ void add_mux(std::string select_name, std::string is_true, std::string is_false,
 
 }
 void add_assignment(std::string left, std::string right, graph_t * list){
-    data_t temp_obj;
-    temp_obj.name           = comp_toString(REG)+std::to_string(list->count);
-    temp_obj.input_1        = list_search(list, left);
+    node_t temp_obj;
+    temp_obj.name           = comp_toString(REG)+std::to_string(list->nodes.size());
+    temp_obj.input_1        = edge_search(list, left, false);
     temp_obj.input_2        = NULL;
-    temp_obj.output         = list_search(list, right);
-    temp_obj.select   = NULL;
+    temp_obj.output         = edge_search(list, right, true);
+    temp_obj.select         = NULL;
     temp_obj.type           = REG;
     temp_obj.is_signed      = (temp_obj.input_1->is_signed
                                ||temp_obj.input_2->is_signed
@@ -170,13 +191,12 @@ void add_assignment(std::string left, std::string right, graph_t * list){
         std::cout << node_toString(temp_obj) << std::endl;
     #endif
 
-    list->count++;
-    list->data_v.push_back(temp_obj);
+    list->nodes.push_back(temp_obj);
 
 
 }
 void free_list(graph_t * list){
-    for(int i=0;i<list->count;++i){
+    for(int i=0;i<list->nodes.size();++i){
     }
-    list->data_v.clear();
+    list->nodes.clear();
 }
