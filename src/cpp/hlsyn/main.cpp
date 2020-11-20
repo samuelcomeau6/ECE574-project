@@ -5,6 +5,7 @@
 
 #include "parse.h"
 #include "path.h"
+#include "scheduling.h"
 
 int main(int argc, char * argv[]){
     if(argc!=4){
@@ -18,5 +19,7 @@ int main(int argc, char * argv[]){
     g.inop.name = "inop";
     g.onop.name = "onop";
     parse(input_filename, &g);
-    std::cout << g.graph_toString();
+    alap(&g,5);
+    std::cout << g.scheduled_graph_toString();
+
 }

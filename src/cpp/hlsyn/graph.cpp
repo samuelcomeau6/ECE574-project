@@ -49,7 +49,7 @@ void Graph::add_node(comp_t component_type, std::string input1_name, std::string
     temp_obj->width          = max(temp_obj->input_1->width,
                                   temp_obj->input_1->width,
                                   temp_obj->input_1->width);
-    temp_obj->duration       = 0;
+    temp_obj->duration       = get_duration(component_type,temp_obj->width);
 	temp_obj->color 		    = "White";
     nodes.push_back(temp_obj);
     if(nodes[nodes.size()-1]->input_1->to == NULL){
@@ -88,12 +88,13 @@ int max(int a, int b, int c){
     return out;
 }
 
-std::string Graph::graph_toString(void){
+std::string Graph::start_graph_toString(void){
     std::string out = "digraph{\n";
     out = out + "inop[label = \"inop\"]\n";
     out = out + "onop[label = \"onop\"]\n";
     for(int i=0;i<this->nodes.size();++i){
-         out = out + nodes[i]->name + "[label =\"" + node_toString(*this->nodes[i]) + "\"]\n";
+         out = out + nodes[i]->name + "[label =\"" + node_toString(*this->nodes[i])+ "t:"
+         + std::to_string(this->nodes[i]->start_time)+"+"+std::to_string(this->nodes[i]->duration)+ "\"]\n";
     }
     for(int i=0;i<this->edges.size();++i){
         if(this->edges[i]->from != NULL) out = out + this->edges[i]->from->name;
@@ -101,7 +102,24 @@ std::string Graph::graph_toString(void){
         if(this->edges[i]->to != NULL) out = out + this->edges[i]->to->name;
         out = out + "[label =\"" + this->edges[i]->name + "\"]\n";
     }
-    out = out + "}";
+    return out;
+}
+std::string Graph::graph_toString(void){
+    std::string out = this->start_graph_toString() + "}\n";
+    return out;
+}
+std::string Graph::scheduled_graph_toString(void){
+    std::string out = this->start_graph_toString();
+    for(int t=0;t<this->onop.start_time;++t){
+        out = out + "{rank = same; ";
+        for(int i=0;i<this->nodes.size();++i){
+            if(this->nodes[i]->start_time==t){
+                out = out + this->nodes[i]->name +"; ";
+            }
+        }
+        out = out + "}\n";
+    }
+    out = out + "}\n";
     return out;
 }
 
@@ -155,4 +173,18 @@ edge_t* edge_search(Graph * list, std::string name,bool is_from){
         name.c_str());
     exit(EXIT_FAILURE);
     return NULL;
+}
+int get_duration(comp_t type, int width){
+    switch(type){
+        case MUL:
+            return 2;
+            break;
+        case DIV:
+        case MOD:
+            return 3;
+            break;
+        default:
+            return 1;
+            break;
+    }
 }

@@ -14,7 +14,7 @@ struct edge_struct{
    	comp_t type;
 	bool is_signed;
 	int          width;
-	float        duration;
+	int        duration;
 	std::string  color;
 
 };
@@ -28,8 +28,9 @@ struct node_struct{
 	struct edge_struct  *  output;
 	comp_t type;
 	bool is_signed;
-	int          width;
-	float        duration;
+	int width;
+	int duration;
+	int start_time;
 	std::string  color;
 
 };
@@ -45,6 +46,10 @@ class Graph{
         void add_edge(comp_t component_type, std::string name, int data_width, bool is_signed);
         edge_t * copy_edge(edge_t edge);
         std::string graph_toString();
+        std::string scheduled_graph_toString();
+    private:
+        std::string start_graph_toString();
+
 };
 
 std::string node_toString(node_t datum);
@@ -52,4 +57,5 @@ std::string edge_toString(edge_t datum);
 edge_t* edge_search(Graph * list, std::string name,bool is_from);
 int max(int a, int b, int c);
 std::string comp_toString(comp_t component);
+int get_duration(comp_t type, int width);
 #endif
