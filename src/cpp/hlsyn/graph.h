@@ -34,6 +34,8 @@ struct node_struct{
 	int interval[2];
 	std::string color;
 	std::vector<float> prb;
+    std::vector<float> self_force;
+    std::vector<float> total_force;
 
 };
 typedef struct node_struct node_t;
@@ -52,6 +54,7 @@ class Graph{
         edge_t * copy_edge(edge_t edge);
         std::string graph_toString();
         std::string scheduled_graph_toString();
+        void paint(std::string);
     private:
         std::string start_graph_toString();
 

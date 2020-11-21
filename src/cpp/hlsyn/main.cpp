@@ -19,7 +19,9 @@ int main(int argc, char * argv[]){
     g.inop.name = "inop";
     g.onop.name = "onop";
     parse(input_filename, &g);
-    alap(&g,latency);
-    std::cout << g.scheduled_graph_toString();
-
+    //asap(&g);
+    //alap(&g,latency);
+    fds(&g, latency);
+    std::ofstream outfile(output_filename, std::ios::out);
+    outfile << g.scheduled_graph_toString();
 }

@@ -4,6 +4,20 @@
 Graph::Graph(){
 }
 Graph::Graph(const Graph &g){
+    this->inop.name = "inop";
+    this->onop.name = "onop";
+    for(int i=0;i<g.edges.size();++i){
+        edge_t * edge = g.edges[i];
+        this->add_edge(edge->type, edge->name, edge->width, edge->is_signed);
+    }
+    for(int i=0;i<g.nodes.size();++i){
+        node_t * node = g.nodes[i];
+        std::string select = "";
+        if(node->type == MUX2X1){
+            select = node->select->name;
+        }
+        this->add_node(node->type,node->input_1->name,node->input_2->name,select,node->output->name);
+    }
 }
 
 std::string comp_toString(comp_t component) {
@@ -115,7 +129,8 @@ std::string Graph::graph_toString(void){
 std::string Graph::scheduled_graph_toString(void){
     std::string out = this->start_graph_toString();
     for(int t=0;t<this->onop.start_time;++t){
-        out = out + "{rank = same; ";
+        out = out + std::to_string(t) +"\n" + std::to_string(t) +"->"+ std::to_string(t+1);
+        out = out + "{rank = same; "+std::to_string(t)+";";
         for(int i=0;i<this->nodes.size();++i){
             if(this->nodes[i]->start_time==t){
                 out = out + this->nodes[i]->name +"; ";
@@ -190,5 +205,13 @@ int get_duration(comp_t type, int width){
         default:
             return 1;
             break;
+    }
+}
+void Graph::paint(std::string color){
+    for(int i=0;i<this->nodes.size();++i){
+        this->nodes[i]->color = color;
+    }
+    for(int i=0;i<this->edges.size();++i){
+        this->edges[i]->color = color;
     }
 }
