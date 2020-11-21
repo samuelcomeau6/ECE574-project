@@ -19,7 +19,7 @@ int main(int argc, char * argv[]){
     g.inop.name = "inop";
     g.onop.name = "onop";
     parse(input_filename, &g);
-    alap(&g,5);
+    alap(&g,latency);
     std::cout << g.scheduled_graph_toString();
 
 }

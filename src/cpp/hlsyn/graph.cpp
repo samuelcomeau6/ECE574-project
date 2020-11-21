@@ -1,6 +1,10 @@
 #include "graph.h"
 #include <string>
 #include <iostream>
+Graph::Graph(){
+}
+Graph::Graph(const Graph &g){
+}
 
 std::string comp_toString(comp_t component) {
     std::string output;

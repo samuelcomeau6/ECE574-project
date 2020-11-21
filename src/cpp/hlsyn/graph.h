@@ -31,7 +31,9 @@ struct node_struct{
 	int width;
 	int duration;
 	int start_time;
-	std::string  color;
+	int interval[2];
+	std::string color;
+	std::vector<float> prb;
 
 };
 typedef struct node_struct node_t;
@@ -40,8 +42,11 @@ class Graph{
     public:
         node_t inop;
         node_t onop;
+        std::vector<std::vector<float>> q;
     	std::vector<node_t *> nodes;
     	std::vector<edge_t *> edges;
+        Graph();
+    	Graph(const Graph &g);
         void add_node(comp_t component_type, std::string input1_name, std::string input2_name, std::string select, std::string output_name);
         void add_edge(comp_t component_type, std::string name, int data_width, bool is_signed);
         edge_t * copy_edge(edge_t edge);

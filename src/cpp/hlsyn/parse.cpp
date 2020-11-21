@@ -107,6 +107,10 @@ void close(ifstream * file){
 */
 void parse(std::string filename, Graph * list){
     ifstream netlist(filename, std::ios::in);
+    if(!netlist.is_open()){
+        perror("Could not open input file");
+        exit(EXIT_FAILURE);
+    }
     std::string out;
     while(!netlist.eof()){
         std::string nextline;
