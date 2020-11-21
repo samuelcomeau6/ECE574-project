@@ -17,6 +17,8 @@ Graph::Graph(const Graph &g){
             select = node->select->name;
         }
         this->add_node(node->type,node->input_1->name,node->input_2->name,select,node->output->name);
+        this->nodes[i]->color = node->color;
+        this->nodes[i]->start_time = node->start_time;
     }
 }
 
