@@ -23,5 +23,7 @@ int main(int argc, char * argv[]){
     //asap(&g);
     //alap(&g,latency);
     fds(&g, latency);
-    print_verilog(output_filename);
+    //std::cout << g.scheduled_graph_toString();
+    Hlsm h(&g);
+    print_verilog(output_filename, &h);
 }

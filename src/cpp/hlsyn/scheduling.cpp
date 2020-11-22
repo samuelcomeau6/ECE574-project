@@ -16,7 +16,9 @@ void fds(Graph * graph, int latency){
 void compute_timeframe(Graph * graph, int latency){
     //make copies
     Graph g_asap(*graph);
+    std::cout << g_asap.graph_toString();
     Graph g_alap(*graph);
+    std::cout << g_alap.graph_toString();
     //Compute asap
     asap(&g_asap);
     //Compute alap
@@ -109,6 +111,16 @@ void compute_forces(Graph * graph, int end){
             node->total_force[t] = node->self_force[t] + get_pred_force(node, t) + get_suc_force(graph, node, t);
         }
     }
+    #ifdef DEBUG
+        for(int i=0;i<graph->nodes.size();++i){
+            std::cout << "node " << i << " :"  << graph->nodes[i]->name << " ";
+            for(int t=graph->nodes[i]->interval[0];t<=graph->nodes[i]->interval[1];++t){
+                std::cout <<"@"<< t<<":" << graph->nodes[i]->self_force[t] << "," << graph->nodes[i]->total_force[t] << " ";
+            }
+            std::cout << std::endl;
+        }
+    #endif
+
 }
 
 float get_pred_force(node_t * node, int t){

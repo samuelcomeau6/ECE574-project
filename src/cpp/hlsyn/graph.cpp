@@ -13,6 +13,7 @@ Graph::Graph(const Graph &g){
     for(int i=0;i<g.edges.size();++i){
         edge_t * edge = g.edges[i];
         this->add_edge(edge->type, edge->name, edge->width, edge->is_signed);
+        std::cout << this->edges[i]->name << comp_toString(this->edges[i]->type) << edge->from->name;
     }
     for(int i=0;i<g.nodes.size();++i){
         node_t * node = g.nodes[i];
@@ -114,16 +115,18 @@ int max(int a, int b, int c){
 
 std::string Graph::start_graph_toString(void){
     std::string out = "digraph{\n";
-    out = out + "inop[label = \"inop\"]\n";
-    out = out + "onop[label = \"onop\"]\n";
+    out = out + "inop[label = \""+inop.name+"\"]\n";
+    out = out + "onop[label = \""+onop.name+"\"]\n";
     for(int i=0;i<this->nodes.size();++i){
          out = out + nodes[i]->name + "[label =\"" + node_toString(*this->nodes[i])+ "t:"
          + std::to_string(this->nodes[i]->start_time)+"+"+std::to_string(this->nodes[i]->duration)+ "\"]\n";
     }
     for(int i=0;i<this->edges.size();++i){
         if(this->edges[i]->from != NULL) out = out + this->edges[i]->from->name;
+        else out = out + "NULL";
         out = out + "->";
         if(this->edges[i]->to != NULL) out = out + this->edges[i]->to->name;
+        else out = out + "NULL";
         out = out + "[label =\"" + this->edges[i]->name + "\"]\n";
     }
     return out;
@@ -177,7 +180,7 @@ edge_t* edge_search(Graph * list, std::string name,bool is_from){
         if(list->edges[i]->name == name) {
             if(is_from){
                 if(list->edges[i]->from != NULL){
-                    fprintf(stderr,"Signal %s is driven from multiple sources",
+                    fprintf(stderr,"Signal %s is driven from multiple sources\n",
                             list->edges[i]->name.c_str());
                     exit(EXIT_FAILURE);
                 } else {
