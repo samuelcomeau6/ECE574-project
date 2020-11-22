@@ -28,10 +28,12 @@ void compute_timeframe(Graph * graph, int latency){
             graph->nodes[i]->interval[1] = g_alap.nodes[i]->start_time;
         }
     }
-    for(int i=0;i<graph->nodes.size();++i){
-        std::cout << "node " << i << " :"  << graph->nodes[i]->name;
-        std::cout << " interval:[" << graph->nodes[i]->interval[0] << "," << graph->nodes[i]->interval[1] << "]" << std::endl;
-    }
+    #ifdef DEBUG
+        for(int i=0;i<graph->nodes.size();++i){
+            std::cout << "node " << i << " :"  << graph->nodes[i]->name;
+            std::cout << " interval:[" << graph->nodes[i]->interval[0] << "," << graph->nodes[i]->interval[1] << "]" << std::endl;
+        }
+    #endif
 
 }
 void compute_probability(Graph * graph, int end){
@@ -171,6 +173,7 @@ void alap(Graph * graph,int latency){
 }
 void asap(Graph * graph){
     graph->inop.color="scheduled";
+    graph->inop.start_time=0;
     bool unscheduled_nodes = true;
     int t=1;
     while(unscheduled_nodes){

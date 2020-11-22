@@ -5,7 +5,11 @@ Graph::Graph(){
 }
 Graph::Graph(const Graph &g){
     this->inop.name = "inop";
+    this->inop.duration = 0;
+    this->inop.start_time=0;
     this->onop.name = "onop";
+    this->onop.duration = 0;
+    this->onop.start_time=0;
     for(int i=0;i<g.edges.size();++i){
         edge_t * edge = g.edges[i];
         this->add_edge(edge->type, edge->name, edge->width, edge->is_signed);

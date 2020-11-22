@@ -6,6 +6,7 @@
 #include "parse.h"
 #include "path.h"
 #include "scheduling.h"
+#include "verilog.h"
 
 int main(int argc, char * argv[]){
     if(argc!=4){
@@ -22,6 +23,5 @@ int main(int argc, char * argv[]){
     //asap(&g);
     //alap(&g,latency);
     fds(&g, latency);
-    std::ofstream outfile(output_filename, std::ios::out);
-    outfile << g.scheduled_graph_toString();
+    print_verilog(output_filename);
 }
