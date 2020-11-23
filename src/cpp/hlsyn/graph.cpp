@@ -5,15 +5,16 @@ Graph::Graph(){
 }
 Graph::Graph(const Graph &g){
     this->inop.name = "inop";
-    this->inop.duration = 0;
-    this->inop.start_time=0;
+    this->inop.duration     = g.inop.duration;
+    this->inop.start_time   = g.inop.start_time;
     this->onop.name = "onop";
-    this->onop.duration = 0;
-    this->onop.start_time=0;
+    this->onop.duration = g.onop.duration;
+    this->onop.start_time=g.onop.start_time;
     for(int i=0;i<g.edges.size();++i){
         edge_t * edge = g.edges[i];
         this->add_edge(edge->type, edge->name, edge->width, edge->is_signed);
         std::cout << this->edges[i]->name << comp_toString(this->edges[i]->type) << edge->from->name;
+        std::cout << "i:" << i << " orig|E|:" << g.edges.size() << " copy|E|" << this->edges.size();
     }
     for(int i=0;i<g.nodes.size();++i){
         node_t * node = g.nodes[i];
@@ -21,7 +22,8 @@ Graph::Graph(const Graph &g){
         if(node->type == MUX2X1){
             select = node->select->name;
         }
-        this->add_node(node->type,node->input_1->name,node->input_2->name,select,node->output->name);
+        this->add_node(node->type, node->input_1->name, node->input_2->name, select, node->output->name);
+        std::cout << "i:" << i << " orig|E|:" << g.edges.size() << " copy|E|" << this->edges.size();
         this->nodes[i]->color = node->color;
         this->nodes[i]->start_time = node->start_time;
     }
@@ -148,6 +150,7 @@ std::string Graph::scheduled_graph_toString(void){
         out = out + "}\n";
     }
     out = out + "}\n";
+    out = out + "/" + "/" + std::to_string(this->edges.size()) + "edges";
     return out;
 }
 
@@ -176,6 +179,8 @@ std::string edge_toString(edge_t datum){
     return out_string;
 }
 edge_t* edge_search(Graph * list, std::string name,bool is_from){
+    bool addable=false;
+    int add_index=0;
     for(int i=0;i<=list->edges.size();++i){
         if(list->edges[i]->name == name) {
             if(is_from){
@@ -188,14 +193,26 @@ edge_t* edge_search(Graph * list, std::string name,bool is_from){
                 }
             } else {
                 if(list->edges[i]->to!=NULL){
-                    list->add_edge(list->edges[i]->type, list->edges[i]->name, list->edges[i]->width, list->edges[i]->is_signed);
-                    list->edges[list->edges.size()-1]->from = list->edges[i]->from;
-                    return list->edges[list->edges.size()-1];
+                    addable=true;
+                    add_index=i;
                 } else {
+                    if(list->edges[i]->from == NULL){
+                        //Repair copied edge
+                        for(int j=0;j<list->edges.size();++j){
+                            if(list->edges[j]->name == name && list->edges[j]->from != NULL) {
+                                list->edges[i]->from = list->edges[j]->from;
+                            }
+                        }
+                    }
                     return list->edges[i];
                 }
             }
         }
+    }
+    if(addable){
+        list->add_edge(list->edges[add_index]->type, list->edges[add_index]->name, list->edges[add_index]->width, list->edges[add_index]->is_signed);
+        list->edges[list->edges.size()-1]->from = list->edges[add_index]->from;
+        return list->edges[list->edges.size()-1];
     }
     fprintf(stderr,"Failed to locate variable %s\n",
         name.c_str());
