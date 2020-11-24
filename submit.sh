@@ -9,4 +9,5 @@ cp ./src/cpp/dpgen/CMakeLists.txt $subfolder/src/
 cp ./src/cpp/dpgen/CMakeLists.txt $subfolder/
 printf "cmake_minimum_required(VERSION 3.15)\n" > $subfolder/CMakeLists.txt
 printf "project(dpgen)\n" >> $subfolder/CMakeLists.txt
-printf "add_subdirectory(src)" >> $subfolder/CMakeLists.txt
+printf "add_subdirectory(src)\n" >> $subfolder/CMakeLists.txt
+printf "configure_file(./src/verilog_template.vh verilog_template.vh COPYONLY)" >> $subfolder/CMakeLists.txt
