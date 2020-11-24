@@ -36,12 +36,13 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include <regex>
+#include <boost/regex.hpp>
 #include <stdlib.h>
 #include "parse.h"
 #include "path.h"
 
 using namespace std;
+using namespace boost;
 #define TEN_WORD_REGEX "(?:,\\W+(\\w+))?(?:,\\W+(\\w+))?(?:,\\W+(\\w+))?"\
                        "(?:,\\W+(\\w+))?(?:,\\W+(\\w+))?(?:,\\W+(\\w+))?"\
                        "(?:,\\W+(\\w+))?(?:,\\W+(\\w+))?(?:,\\W+(\\w+))?"\
@@ -66,13 +67,17 @@ namespace parse{
         bool data_signed=0;
         comp_t component=ERR;
         //Check for data types
-        std::regex data_regex("(input|output|register|wire)"
+        boost::regex data_regex("(input|output|register|wire)"
                                "\\W+?(Int|UInt)(\\d+)\\W+(\\w+)"
-                               TEN_WORD_REGEX,
-                               std::regex_constants::ECMAScript);
-        std::smatch matches;
-        std::smatch tmatches;
-        if(std::regex_search(line, matches, data_regex)){
+                               TEN_WORD_REGEX);
+        std::string::const_iterator start;
+        std::string::const_iterator end;
+        start = line.begin();
+        end = line.end();
+        boost::match_results<std::string::const_iterator> matches;
+        boost::match_results<std::string::const_iterator> tmatches;
+        boost::match_flag_type flags = boost::match_default;
+        if(boost::regex_search(start, end, matches, data_regex, flags)){
             if(matches[1]=="input") component=INPUT;
             if(matches[1]=="output") component=OUTPUT;
             if(matches[1]=="register") component=REG;
@@ -90,10 +95,9 @@ namespace parse{
             }
        }
        //Check for binary operators
-       std::regex biop_regex("(\\w+)\\s*=\\s*(\\w+)\\s*"
-                           "([^a-zA-Z0-9_ \\t\\n\\r\\f][=><]?)\\s*(\\w+)\\s*",
-                           std::regex_constants::ECMAScript);
-       if(std::regex_search(line, matches, biop_regex)){
+       boost::regex biop_regex("(\\w+)\\s*=\\s*(\\w+)\\s*"
+                           "([^a-zA-Z0-9_ \\t\\n\\r\\f][=><]?)\\s*(\\w+)\\s*");
+        if(boost::regex_search(start, end, matches, biop_regex, flags)){
             component=ERR;
             #ifdef DEBUG
                 std::cout << "sign is " << matches[3] << std::endl;
@@ -115,10 +119,9 @@ namespace parse{
             if(matches[3]==">>") component=SHR;
             if(matches[3]=="==") component=COMPEQ;
             //Check for ternary operator
-            std::regex triop_regex("(\\w+)\\s*=\\s*(\\w+)\\s*"
-                                   "\\?\\s*(\\w+)\\s*:\\s*(\\w+)\\s*",
-                                   std::regex_constants::ECMAScript);
-            if(std::regex_search(line, tmatches, triop_regex)){
+            boost::regex triop_regex("(\\w+)\\s*=\\s*(\\w+)\\s*"
+                                   "\\?\\s*(\\w+)\\s*:\\s*(\\w+)\\s*");
+            if(boost::regex_search(start, end, tmatches, triop_regex, flags)){
                 path::add_mux(tmatches[2],tmatches[3],tmatches[4],tmatches[1]);
             } else {
                 if(component!=ERR) path::add_op(component, matches[2], matches[4], matches[1]);
@@ -129,9 +132,8 @@ namespace parse{
             }
         }
        //Check for assignment
-       std::regex noop_regex("(\\w+)\\s*=\\s*(\\w+)\\s*$",
-                             std::regex_constants::ECMAScript);
-       if(std::regex_search(line, matches, noop_regex)){
+       boost::regex noop_regex("(\\w+)\\s*=\\s*(\\w+)\\s*$");
+       if(boost::regex_search(start, end, matches, noop_regex, flags)){
             path::add_assignment(matches[1], matches[2]);
        }
        return line;
@@ -143,6 +145,7 @@ namespace parse{
     void close(ifstream * file){
         file->close();
     }
+    
 
     /* parse
         implements other functions to return a completed netlist type
