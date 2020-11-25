@@ -2,6 +2,12 @@
 #include <string>
 #include <iostream>
 Graph::Graph(){
+    this->inop.name = "inop";
+    this->inop.duration     = 0;
+    this->inop.start_time   = 0;
+    this->onop.name = "onop";
+    this->onop.duration = 0;
+    this->onop.start_time=21;
 }
 Graph::Graph(const Graph &g){
     this->inop.name = "inop";
@@ -13,8 +19,7 @@ Graph::Graph(const Graph &g){
     for(int i=0;i<g.edges.size();++i){
         edge_t * edge = g.edges[i];
         this->add_edge(edge->type, edge->name, edge->width, edge->is_signed);
-        std::cout << this->edges[i]->name << comp_toString(this->edges[i]->type) << edge->from->name;
-        std::cout << "i:" << i << " orig|E|:" << g.edges.size() << " copy|E|" << this->edges.size();
+
     }
     for(int i=0;i<g.nodes.size();++i){
         node_t * node = g.nodes[i];
@@ -23,7 +28,6 @@ Graph::Graph(const Graph &g){
             select = node->select->name;
         }
         this->add_node(node->type, node->input_1->name, node->input_2->name, select, node->output->name);
-        std::cout << "i:" << i << " orig|E|:" << g.edges.size() << " copy|E|" << this->edges.size();
         this->nodes[i]->color = node->color;
         this->nodes[i]->start_time = node->start_time;
     }
@@ -96,9 +100,9 @@ void Graph::add_edge(comp_t component_type, std::string name, int data_width, bo
 
     edge_t * temp_obj = new edge_t;
     temp_obj->name           = name;
-    if(component_type==INPUT) temp_obj->from = &this->inop;
+    if(component_type==INPUT) temp_obj->from = &(this->inop);
     else temp_obj->from        = NULL;
-    if(component_type==OUTPUT) temp_obj->to = &this->onop;
+    if(component_type==OUTPUT) temp_obj->to = &(this->onop);
     else temp_obj->to         = NULL;
     temp_obj->type           = component_type;
     temp_obj->is_signed      = is_signed;
@@ -141,7 +145,7 @@ std::string Graph::scheduled_graph_toString(void){
     std::string out = this->start_graph_toString();
     for(int t=0;t<this->onop.start_time;++t){
         out = out + std::to_string(t) +"\n" + std::to_string(t) +"->"+ std::to_string(t+1);
-        out = out + "{rank = same; "+std::to_string(t)+";";
+        out = out + "\n{rank = same; "+std::to_string(t)+";";
         for(int i=0;i<this->nodes.size();++i){
             if(this->nodes[i]->start_time==t){
                 out = out + this->nodes[i]->name +"; ";
@@ -150,7 +154,8 @@ std::string Graph::scheduled_graph_toString(void){
         out = out + "}\n";
     }
     out = out + "}\n";
-    out = out + "/" + "/" + std::to_string(this->edges.size()) + "edges";
+    out = out + "/" + "/" + std::to_string(this->edges.size()) + "edges\n";
+    out = out + "/" + "/" + std::to_string(this->nodes.size()) + "nodes\n";
     return out;
 }
 
@@ -181,7 +186,7 @@ std::string edge_toString(edge_t datum){
 edge_t* edge_search(Graph * list, std::string name,bool is_from){
     bool addable=false;
     int add_index=0;
-    for(int i=0;i<=list->edges.size();++i){
+    for(int i=0;i<=list->edges.size()-1;++i){
         if(list->edges[i]->name == name) {
             if(is_from){
                 if(list->edges[i]->from != NULL){

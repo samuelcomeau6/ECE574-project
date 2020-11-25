@@ -7,7 +7,7 @@ Created by Samuel Comeau
 #include <fstream>
 #include <string>
 #include <vector>
-#include <regex>
+#include <boost/regex.hpp>
 #include <stdlib.h>
 #include "parse.h"
 #include "path.h"
@@ -17,6 +17,7 @@ using namespace std;
                    "(?:,\\W+(\\w+))?(?:,\\W+(\\w+))?(?:,\\W+(\\w+))?"\
                    "(?:,\\W+(\\w+))?(?:,\\W+(\\w+))?(?:,\\W+(\\w+))?"\
                    "(?:,\\W+(\\w+))?"
+#define HUNDRED_WORD_REGEX TEN_WORD_REGEX TEN_WORD_REGEX TEN_WORD_REGEX TEN_WORD_REGEX TEN_WORD_REGEX TEN_WORD_REGEX TEN_WORD_REGEX TEN_WORD_REGEX TEN_WORD_REGEX TEN_WORD_REGEX
 
 /* parse_line
 */
@@ -25,15 +26,20 @@ std::string parse_line(string line, Graph * list){
     bool data_signed=0;
     comp_t component=ERR;
     //Check for data types
-    std::regex data_regex("(input|output|variable)"
+    boost::regex data_regex("(input|output|variable|wire)"
                            "\\W+?(Int|UInt)(\\d+)\\W+(\\w+)"
-                           TEN_WORD_REGEX,
-                           std::regex_constants::ECMAScript);
-    std::smatch matches;
-    std::smatch tmatches;
-    if(std::regex_search(line, matches, data_regex)){
+                           HUNDRED_WORD_REGEX );
+    std::string::const_iterator start;
+    std::string::const_iterator end;
+    start = line.begin();
+    end = line.end();
+    boost::match_results<std::string::const_iterator> matches;
+    boost::match_results<std::string::const_iterator> tmatches;
+    boost::match_flag_type flags = boost::match_default;
+    if(boost::regex_search(start, end, matches, data_regex, flags)){
         if(matches[1]=="input") component=INPUT;
         if(matches[1]=="output") component=OUTPUT;
+        if(matches[1]=="wire") component=VAR;
         if(matches[1]=="variable") component=VAR;
 
         if(matches[2]=="Int") data_signed=1;
@@ -48,10 +54,9 @@ std::string parse_line(string line, Graph * list){
         }
    }
    //Check for binary operators
-   std::regex biop_regex("(\\w+)\\s*=\\s*(\\w+)\\s*"
-                       "([^a-zA-Z0-9_ \\t\\n\\r\\f][=><]?)\\s*(\\w+)\\s*",
-                       std::regex_constants::ECMAScript);
-   if(std::regex_search(line, matches, biop_regex)){
+   boost::regex biop_regex("(\\w+)\\s*=\\s*(\\w+)\\s*"
+                       "([^a-zA-Z0-9_ \\t\\n\\r\\f][=><]?)\\s*(\\w+)\\s*");
+    if(boost::regex_search(start, end, matches, biop_regex, flags)){
         component=ERR;
         #ifdef DEBUG
             std::cout << "sign is " << matches[3] << std::endl;
@@ -73,10 +78,9 @@ std::string parse_line(string line, Graph * list){
         if(matches[3]==">>") component=SHR;
         if(matches[3]=="==") component=COMPEQ;
         //Check for ternary operator
-        std::regex triop_regex("(\\w+)\\s*=\\s*(\\w+)\\s*"
-                               "\\?\\s*(\\w+)\\s*:\\s*(\\w+)\\s*",
-                               std::regex_constants::ECMAScript);
-        if(std::regex_search(line, tmatches, triop_regex)){
+        boost::regex triop_regex("(\\w+)\\s*=\\s*(\\w+)\\s*"
+                               "\\?\\s*(\\w+)\\s*:\\s*(\\w+)\\s*");
+        if(boost::regex_search(start, end, tmatches, triop_regex, flags)){
             add_mux(tmatches[2],tmatches[3],tmatches[4],tmatches[1], list);
         } else {
             if(component!=ERR) add_op(component, matches[2], matches[4], matches[1], list);
@@ -87,9 +91,8 @@ std::string parse_line(string line, Graph * list){
         }
     }
    //Check for assignment
-   std::regex noop_regex("(\\w+?)\\s*=\\s*(\\w+?)\\s*$",
-                         std::regex_constants::ECMAScript);
-   if(std::regex_search(line, matches, noop_regex)){
+   boost::regex noop_regex("(\\w+)\\s*=\\s*(\\w+)\\s*$");
+   if(boost::regex_search(start, end, matches, noop_regex, flags)){
         add_assignment(matches[1], matches[2], list);
    }
    return line;

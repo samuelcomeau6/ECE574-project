@@ -3,7 +3,7 @@ if [ -z "$1" ]
 then
     buildtype=DEBUG
 else
-    buildtype=$1
+    buildtype=$@
 fi
 mkdir -p build
 cmake -DCMAKE_BUILD_TYPE=$buildtype . -Bbuild

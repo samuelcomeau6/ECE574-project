@@ -16,13 +16,15 @@ void fds(Graph * graph, int latency){
 void compute_timeframe(Graph * graph, int latency){
     //make copies
     Graph g_asap(*graph);
-    std::cout << g_asap.graph_toString();
     Graph g_alap(*graph);
-    std::cout << g_alap.graph_toString();
     //Compute asap
     asap(&g_asap);
     //Compute alap
     alap(&g_alap, latency);
+    #ifdef DEBUG3
+        std::cout << g_alap.scheduled_grap_toString();
+        std::cout << g_asap.scheduled_grap_toString();
+    #endif
     for(int i=0;i<graph->nodes.size();++i){
         if(graph->nodes[i]->color!="scheduled"){
             //Time frame is [asap, alap]
@@ -30,7 +32,7 @@ void compute_timeframe(Graph * graph, int latency){
             graph->nodes[i]->interval[1] = g_alap.nodes[i]->start_time;
         }
     }
-    #ifdef DEBUG
+    #ifdef DEBUG2
         for(int i=0;i<graph->nodes.size();++i){
             std::cout << "node " << i << " :"  << graph->nodes[i]->name;
             std::cout << " interval:[" << graph->nodes[i]->interval[0] << "," << graph->nodes[i]->interval[1] << "]" << std::endl;
@@ -41,7 +43,7 @@ void compute_timeframe(Graph * graph, int latency){
 void compute_probability(Graph * graph, int end){
     for(int i=0;i<graph->nodes.size();++i){
         node_t * node = graph->nodes[i];
-        node->prb.resize(end);
+        node->prb.resize(end+1);
         for(int t=0;t<=end;++t){
             //if t is outside time frame prb=0
             if(t<node->interval[0] || t>node->interval[1]){
@@ -50,7 +52,8 @@ void compute_probability(Graph * graph, int end){
             //else prb=1/(width timeframe)
             else {
                 int width=node->interval[1] - node->interval[0] + 1;
-                node->prb[t] = 1.0/width;
+                if(width!=0) node->prb[t] = 1.0/width;
+                else node->prb[t] = 0.0;
             }
         }
     }
@@ -58,7 +61,7 @@ void compute_probability(Graph * graph, int end){
 void compute_type_dist(Graph * graph, int end){
     graph->q.resize(5);
     for(int i=0;i<graph->q.size();++i){
-        graph->q[i].resize(end);
+        graph->q[i].resize(end+1);
     }
     //for each node, v
     for(int i=0;i<graph->nodes.size();++i){
@@ -90,8 +93,8 @@ int get_bin(comp_t type){
 void compute_forces(Graph * graph, int end){
     for(int j=0;j<graph->nodes.size();++j){
         node_t * node = graph->nodes[j];
-        node->self_force.resize(end);
-        node->total_force.resize(end);
+        node->self_force.resize(end+1);
+        node->total_force.resize(end+1);
         for(int t=node->interval[0];t<=node->interval[1];++t){
             //v.selfforce = sigma( v.force(i), intervalStart, intervalEnd)
             for(int i=node->interval[0];i<=node->interval[1];++i){
@@ -111,7 +114,7 @@ void compute_forces(Graph * graph, int end){
             node->total_force[t] = node->self_force[t] + get_pred_force(node, t) + get_suc_force(graph, node, t);
         }
     }
-    #ifdef DEBUG
+    #ifdef DEBUG3
         for(int i=0;i<graph->nodes.size();++i){
             std::cout << "node " << i << " :"  << graph->nodes[i]->name << " ";
             for(int t=graph->nodes[i]->interval[0];t<=graph->nodes[i]->interval[1];++t){
@@ -125,6 +128,8 @@ void compute_forces(Graph * graph, int end){
 
 float get_pred_force(node_t * node, int t){
     float pred_force=0.0;
+    if(node->input_1->from->name=="inop") return 0;
+    if(node->input_2->from->name=="inop") return 0;
     if(t<=node->input_1->from->interval[1]){
         //In the interval for input1
         pred_force+=node->input_1->from->self_force[t];
@@ -169,7 +174,11 @@ void alap(Graph * graph,int latency){
     graph->onop.color="scheduled";
     int t=latency;
     bool unscheduled_nodes = true;
-    while(unscheduled_nodes && t>0){
+    while(unscheduled_nodes){
+        if(t<0) {
+            fprintf(stderr, "Datapath does not fit with latency constraint of:%d, relax constraint.\n",latency);
+            exit(EXIT_FAILURE);
+        }
         unscheduled_nodes = false;
         for(int i=0;i<graph->nodes.size();++i){
             if(graph->nodes[i]->color!="scheduled"){

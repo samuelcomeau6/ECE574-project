@@ -6,5 +6,11 @@
     void print_verilog(std::string output_filename, Hlsm * h);
     std::string parse_module_name(std::string filename);
     std::string print_inputs(Hlsm * h);
+    std::string print_outputs(Hlsm * h);
+    std::string print_modules(Hlsm * h);
+    std::string node_to_V(node_t node);
+    std::string type_to_V(comp_t comp);
+    std::string sign_extend(edge_t * edge, int datawidth, bool is_signed);
+
 
 #endif
