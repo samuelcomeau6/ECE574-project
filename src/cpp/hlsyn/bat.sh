@@ -1,9 +1,12 @@
-if ./build.sh
+set -e
+./build.sh
+if [ $1 = "gdb" ]
 then
-    if [ $1 = "gdb" ]
+    gdb -args ./hlsyn ./newtest/$2 30 fds.v
+else
+    if [ $1 = "sim" ]
     then
-        gdb -args ./hlsyn ./newtest/hls_test2.c 5 fds.v
-    else
-        ./hlsyn ./newtest/hls_test2.c 5 fds.v
+        ./hlsyn ./newtest/$2 30 ./newtest/${2/.c/.v}
+        ./sim.sh ${2/.c/.v}
     fi
 fi

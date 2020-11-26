@@ -10,6 +10,7 @@
 #include "hlsm.h"
 
 void print_verilog(std::string output_filename, Hlsm * h){
+    h->check_assignments();
     std::ofstream outfile(output_filename, std::ios::out);
     outfile << header;
     outfile << "module HLSM (" << std::endl;
@@ -18,8 +19,7 @@ void print_verilog(std::string output_filename, Hlsm * h){
     outfile << print_inputs(h);
     outfile << print_outputs(h);
     outfile << ");" << std::endl;
-//    outfile << print_wires(h);
-//    outfile << print_regs(h);
+    outfile << print_wires(h);
     outfile << print_modules(h);
 //    outfile << print_states(h);
     outfile << "\nendmodule\n" << std::endl;
@@ -33,11 +33,29 @@ std::string parse_module_name(std::string filename){
 
     return matches[1];
 }
+std::string print_wires(Hlsm *h){
+    std::string out;
+    for(int i=0;i<h->graph.edges.size();++i){
+        edge_t * edge = h->graph.edges[i];
+        if(edge->type == WIRE && !edge->is_copy){
+            out = out +"\twire ";
+            if(edge->width > 1){
+                if(edge->is_signed) out += "signed";
+                out += "[" + std::to_string(edge->width - 1);
+                out += ":0] " + edge->name + ";\n";
+            } else {
+                out += edge->name;
+                out+= ";\n";
+            }
+        }
+    }
+    return out;
+}
 std::string print_inputs(Hlsm * h){
     std::string out;
     for(int i=0;i<h->graph.edges.size();++i){
         edge_t * edge = h->graph.edges[i];
-        if(edge->type == INPUT){
+        if(edge->type == INPUT && !edge->is_copy){
             out = out + "\tinput ";
             if(edge->width > 1){
                 if(edge->is_signed) out = out + "signed ";
@@ -47,10 +65,6 @@ std::string print_inputs(Hlsm * h){
                 out += edge->name;
                 out += ",\n";
             }
-        }
-        if(edge->type == OUTPUT){
-            //FIXME TODO Assume based on how graphs are built that outputs are after inputs
-            return out;
         }
     }
     return out;
@@ -80,7 +94,7 @@ std::string print_modules(Hlsm * h){
     std::string out;
     for(int i=0;i<h->graph.nodes.size();++i){
         node_t * node = h->graph.nodes[i];
-        out = out + node_to_V(*node);
+        if(node->type != VAR) out = out + node_to_V(*node);
     }
     return out;
 }
@@ -89,7 +103,7 @@ std::string node_to_V(node_t node){
     output += "\t";
     if(node.is_signed) output = output + "S";
     output += type_to_V(node.type);
-    output += " #(.DATAWIDTH=" + std::to_string(node.width) + ") ";
+    output += " #(.DATAWIDTH(" + std::to_string(node.width) + ")) ";
     if(node.is_signed) output = output + "s_";
     else output = output + "u_";
     output += node.name;
@@ -116,7 +130,7 @@ std::string node_to_V(node_t node){
         case MUX2X1:
             output += sign_extend(node.input_1, node.width, node.is_signed) + ", ";
             output += sign_extend(node.input_2, node.width, node.is_signed) + ", ";
-            output += node.select->name + ", ";
+            output += sign_extend(node.select, 1, false) + ", ";
             output += node.output->name;
             break;
         case COMPLT:
@@ -132,7 +146,7 @@ std::string node_to_V(node_t node){
         case COMPGT:
             output += ".a(" +sign_extend(node.input_1, node.width, node.is_signed) + "), ";
             output += ".b(" + sign_extend(node.input_2, node.width, node.is_signed) + "), ";
-            output += ".gt(" + node.output->name + ")";
+            output += ".gt(" + sign_extend(node.output, 1, false) + ")";
             break;
         default:
             fprintf(stderr, " Could not convert %s into a proper module\n",node.name.c_str());
@@ -174,10 +188,10 @@ std::string sign_extend(edge_t * edge, int datawidth, bool is_signed){
         if(edge->is_signed == is_signed){
             return edge->name;
         } else if(!edge->is_signed) {
-            output = "{1'd0, [" + std::to_string(edge->width-2) + ":0]" + edge->name + "}";
+            output = "{1'd0," + edge->name + " [" + std::to_string(edge->width-2) + ":0]}";
             return output;
         } else {
-            output = "[" + std::to_string(edge->width-1) + ":0]" + edge->name;
+            output = edge->name + "[" + std::to_string(edge->width-1) + ":0]";
             return output;
         }
     }
@@ -185,9 +199,10 @@ std::string sign_extend(edge_t * edge, int datawidth, bool is_signed){
         //Truncate
         if(edge->is_signed && is_signed){
             //Keep sign
-            output = "{[" + std::to_string(edge->width-1) +"],[" + std::to_string(datawidth) + ":0]" + edge->name +"}";
+            output  = "{" +edge->name + "[" + std::to_string(edge->width-1) +"]," + edge->name;
+            output += "[" + std::to_string(datawidth) + ":0]" +"}";
         } else {
-            output = "[" + std::to_string(datawidth-1) + ":0]" + edge->name;
+            output = edge->name + "[" + std::to_string(datawidth-1) + ":0]";
         }
     }
     if(edge->width < datawidth){
@@ -196,7 +211,7 @@ std::string sign_extend(edge_t * edge, int datawidth, bool is_signed){
             output = "{{" + std::to_string(datawidth - edge->width) + "{" + edge->name + "[" + std::to_string(edge->width - 1);
             output += "]}}, " + edge->name + "}";
         } else {
-            output = "{{" + std::to_string(datawidth - edge->width) + "{1'd0}}, " + std::to_string(edge->width) +"}";
+            output = "{{" + std::to_string(datawidth - edge->width) + "{1'd0}}, " + edge->name +"}";
         }
     }
     return output;

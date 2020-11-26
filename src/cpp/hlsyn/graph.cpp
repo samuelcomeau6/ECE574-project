@@ -18,8 +18,14 @@ Graph::Graph(const Graph &g){
     this->onop.start_time=g.onop.start_time;
     for(int i=0;i<g.edges.size();++i){
         edge_t * edge = g.edges[i];
-        this->add_edge(edge->type, edge->name, edge->width, edge->is_signed);
-
+        bool duplicate=false;
+        for(int j=0;j<i;++j){
+            if(edge->name == g.edges[j]->name && i!=j){
+                duplicate=true;
+            }
+        }
+            this->add_edge(edge->type, edge->name, edge->width, edge->is_signed);
+            this->edges.back()->is_copy = duplicate;
     }
     for(int i=0;i<g.nodes.size();++i){
         node_t * node = g.nodes[i];
@@ -69,7 +75,7 @@ void Graph::add_node(comp_t component_type, std::string input1_name, std::string
     node_t * temp_obj = new node_t;
     temp_obj->name           = comp_toString(component_type)+std::to_string(this->nodes.size());
     temp_obj->input_1        = edge_search(this, input1_name, false);
-    temp_obj->input_2        = edge_search(this, input2_name, false);
+    if(component_type != REG) temp_obj->input_2        = edge_search(this, input2_name, false);
     temp_obj->output         = edge_search(this, output_name, true);
     if(component_type == MUX2X1) {temp_obj->select         = edge_search(this, select, false);}
     else {temp_obj->select = NULL;}
@@ -77,9 +83,7 @@ void Graph::add_node(comp_t component_type, std::string input1_name, std::string
     temp_obj->is_signed      = (temp_obj->input_1->is_signed
                                ||temp_obj->input_2->is_signed
                                ||temp_obj->output->is_signed);
-    temp_obj->width          = max(temp_obj->input_1->width,
-                                  temp_obj->input_1->width,
-                                  temp_obj->input_1->width);
+    temp_obj->width          = temp_obj->output->width;
     temp_obj->duration       = get_duration(component_type,temp_obj->width);
 	temp_obj->color 		    = "White";
     nodes.push_back(temp_obj);
@@ -108,6 +112,7 @@ void Graph::add_edge(comp_t component_type, std::string name, int data_width, bo
     temp_obj->is_signed      = is_signed;
     temp_obj->width          = data_width;
 	temp_obj->color 		    = "White";
+	temp_obj->is_copy       = false;
 
     this->edges.push_back(temp_obj);
 }
@@ -206,6 +211,7 @@ edge_t* edge_search(Graph * list, std::string name,bool is_from){
                         for(int j=0;j<list->edges.size();++j){
                             if(list->edges[j]->name == name && list->edges[j]->from != NULL) {
                                 list->edges[i]->from = list->edges[j]->from;
+                                list->edges[i]->is_copy = true;
                             }
                         }
                     }
@@ -217,6 +223,7 @@ edge_t* edge_search(Graph * list, std::string name,bool is_from){
     if(addable){
         list->add_edge(list->edges[add_index]->type, list->edges[add_index]->name, list->edges[add_index]->width, list->edges[add_index]->is_signed);
         list->edges[list->edges.size()-1]->from = list->edges[add_index]->from;
+        list->edges[list->edges.size()-1]->is_copy = true;
         return list->edges[list->edges.size()-1];
     }
     fprintf(stderr,"Failed to locate variable %s\n",

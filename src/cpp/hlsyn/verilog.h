@@ -11,6 +11,7 @@
     std::string node_to_V(node_t node);
     std::string type_to_V(comp_t comp);
     std::string sign_extend(edge_t * edge, int datawidth, bool is_signed);
+    std::string print_wires(Hlsm *h);
 
 
 #endif

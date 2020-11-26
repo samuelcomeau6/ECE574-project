@@ -16,6 +16,7 @@ struct edge_struct{
 	int          width;
 	int        duration;
 	std::string  color;
+	bool is_copy;
 
 };
 typedef struct edge_struct edge_t;
