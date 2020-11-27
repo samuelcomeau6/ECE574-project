@@ -16,15 +16,24 @@ void add_data(comp_t component_type, std::string name, int data_width, bool is_s
     #endif
 
 }
-void add_op(comp_t component_type, std::string input1_name, std::string input2_name, std::string output_name, Graph * list){
+node_t * add_if(std::string condition, Graph * list){
+    node_t * new_node = list->add_if(condition);
+    #ifdef DEBUG
+        std::cout << "IF: ";
+        std::cout << node_toString(*list->nodes[list->nodes.size()-1]) << std::endl;
+    #endif
+    return new_node;
 
-    list->add_node(component_type, input1_name, input2_name, "", output_name);
+}
+node_t * add_op(comp_t component_type, std::string input1_name, std::string input2_name, std::string output_name, Graph * list){
+
+    node_t * new_node = list->add_node(component_type, input1_name, input2_name, "", output_name);
 
     #ifdef DEBUG
         std::cout << "New operation: ";
         std::cout << node_toString(*list->nodes[list->nodes.size()-1]) << std::endl;
     #endif
-
+    return new_node;
 }
 void add_mux(std::string select_name, std::string is_true, std::string is_false, std::string output_name, Graph * list){
 
@@ -32,7 +41,7 @@ void add_mux(std::string select_name, std::string is_true, std::string is_false,
 
     #ifdef DEBUG
         std::cout << "New mux: ";
-        std::cout << node_toString(*list->nodes[list->nodes.size()-1]) << std::endl;
+        std::cout << node_toString(*list->nodes[list->nodes.size()-1]) << select_name << "?" << std::endl;
     #endif
 
 }

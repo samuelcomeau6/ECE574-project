@@ -20,10 +20,19 @@ int main(int argc, char * argv[]){
     g.inop.name = "inop";
     g.onop.name = "onop";
     parse(input_filename, &g);
-    //asap(&g);
-    //alap(&g,latency);
+    Graph g_asap(g);
+    asap(&g_asap);
+    Graph g_alap(g);
+    alap(&g_alap,latency);
     fds(&g, latency);
-    //std::cout << g.scheduled_graph_toString();
-    Hlsm h(&g);
-    print_verilog(output_filename, &h);
+    if(output_filename == "-fds"){
+        std::cout << g.scheduled_graph_toString();
+    } else if(output_filename == "-alap"){
+        std::cout << g_alap.scheduled_graph_toString();
+    } else if(output_filename == "-asap"){
+        std::cout << g_asap.scheduled_graph_toString();
+    } else {
+        Hlsm h(&g);
+        print_verilog(output_filename, &h);
+    }
 }

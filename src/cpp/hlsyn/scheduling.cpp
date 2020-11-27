@@ -1,6 +1,7 @@
 #include "graph.h"
 #include "scheduling.h"
 #include <iostream>
+#include <fstream>
 void fds(Graph * graph, int latency){
     graph->paint("White");
     graph->onop.start_time = latency+1;
@@ -22,8 +23,8 @@ void compute_timeframe(Graph * graph, int latency){
     //Compute alap
     alap(&g_alap, latency);
     #ifdef DEBUG3
-        std::cout << g_alap.scheduled_grap_toString();
-        std::cout << g_asap.scheduled_grap_toString();
+        std::cout << g_alap.scheduled_graph_toString();
+        std::cout << g_asap.scheduled_graph_toString();
     #endif
     for(int i=0;i<graph->nodes.size();++i){
         if(graph->nodes[i]->color!="scheduled"){
@@ -32,7 +33,7 @@ void compute_timeframe(Graph * graph, int latency){
             graph->nodes[i]->interval[1] = g_alap.nodes[i]->start_time;
         }
     }
-    #ifdef DEBUG2
+    #ifdef DEBUG
         for(int i=0;i<graph->nodes.size();++i){
             std::cout << "node " << i << " :"  << graph->nodes[i]->name;
             std::cout << " interval:[" << graph->nodes[i]->interval[0] << "," << graph->nodes[i]->interval[1] << "]" << std::endl;
@@ -87,6 +88,9 @@ int get_bin(comp_t type){
         case SUB:
             k=3;
             break;
+        default:
+            k=4;
+            break;
     }
     return k;
 }
@@ -111,10 +115,10 @@ void compute_forces(Graph * graph, int end){
     for(int j=0;j<graph->nodes.size();++j){
         node_t * node = graph->nodes[j];
         for(int t=node->interval[0];t<=node->interval[1];++t){
-            node->total_force[t] = node->self_force[t] + get_pred_force(node, t) + get_suc_force(graph, node, t);
+            node->total_force[t] = node->self_force[t] - get_pred_force(node, t) - get_suc_force(graph, node, t);
         }
     }
-    #ifdef DEBUG3
+    #ifdef DEBUG
         for(int i=0;i<graph->nodes.size();++i){
             std::cout << "node " << i << " :"  << graph->nodes[i]->name << " ";
             for(int t=graph->nodes[i]->interval[0];t<=graph->nodes[i]->interval[1];++t){
@@ -182,8 +186,11 @@ void alap(Graph * graph,int latency){
         unscheduled_nodes = false;
         for(int i=0;i<graph->nodes.size();++i){
             if(graph->nodes[i]->color!="scheduled"){
-                unscheduled_nodes=true;
-                if(graph->nodes[i]->output->to->color=="scheduled" && t<=(graph->nodes[i]->output->to->start_time - graph->nodes[i]->duration)){
+                unscheduled_nodes=true;//FIXME only basing scheduablility off of the outputs
+                if(alap_schedulable(graph, i, t)){
+                    #ifdef DEBUG
+                        printf("%s is alap @ %d\n",graph->nodes[i]->name.c_str(),t);
+                    #endif
                     graph->nodes[i]->start_time = t;
                     graph->nodes[i]->color = "scheduled";
                 }
@@ -211,6 +218,8 @@ void asap(Graph * graph){
         ++t;
     }
     graph->onop.start_time=t;
+    std::ofstream asap("asap.txt", std::ios::app);
+    asap << graph->scheduled_graph_toString();
 }
 bool is_schedulable(node_t * node, int t){
     bool input_1_ok=false;
@@ -234,14 +243,28 @@ bool is_schedulable(node_t * node, int t){
            && t>=(node->input_2->from->start_time+node->input_2->from->duration)){
             input_2_ok=true;
         }
+    } else {
+        input_2_ok = true;
     }
     return (input_1_ok && input_2_ok && select_ok);
+}
+bool alap_schedulable(Graph * graph, int index, int t){
+    bool ok=true;
+    std::string out = graph->nodes[index]->output->name;
+    for(int i=0;i<graph->edges.size();++i){
+        edge_t * edge = graph->edges[i];
+        if(out == edge->name){
+            ok = ok && edge->to->color=="scheduled";
+            ok = ok && t<=(edge->to->start_time - graph->nodes[index]->duration);
+        }
+    }
+    return ok;
 }
 bool schedule_min_force(Graph * graph, int end){
     bool unscheduled_nodes = false;
     int min_index = 0;
     int min_time = 0;
-    float min_force = graph->nodes[0]->total_force[0];
+    float min_force = FLT_MAX;
     for(int i=0;i<graph->nodes.size();++i){
         for(int t=graph->nodes[i]->interval[0];t<=graph->nodes[i]->interval[1];++t){
             if(graph->nodes[i]->total_force[t] < min_force && graph->nodes[i]->color!="scheduled"){ //TODO and is schedulable!!
@@ -251,6 +274,10 @@ bool schedule_min_force(Graph * graph, int end){
             }
         }
     }
+    #ifdef DEBUG
+        printf("Scheduling %s @ %d. Had interval of [%d,%d]\n",graph->nodes[min_index]->name.c_str(),min_time,
+                graph->nodes[min_index]->interval[0], graph->nodes[min_index]->interval[1]);
+    #endif
     if(graph->nodes[min_index]->color!="scheduled"){
         graph->nodes[min_index]->start_time = min_time;
         graph->nodes[min_index]->interval[0] = min_time;
@@ -258,5 +285,6 @@ bool schedule_min_force(Graph * graph, int end){
         graph->nodes[min_index]->color = "scheduled";
         unscheduled_nodes=true;
     }
+        
     return unscheduled_nodes;
 }

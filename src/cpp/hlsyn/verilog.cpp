@@ -4,13 +4,15 @@
 #include <iostream>
 #include <fstream>
 #include <regex>
+#include <cmath>
 
 #include "verilog.h"
 #include "v_template.h"
 #include "hlsm.h"
 
 void print_verilog(std::string output_filename, Hlsm * h){
-    h->check_assignments();
+//    h->check_assignments();
+    h->generate_states();
     std::ofstream outfile(output_filename, std::ios::out);
     outfile << header;
     outfile << "module HLSM (" << std::endl;
@@ -20,10 +22,50 @@ void print_verilog(std::string output_filename, Hlsm * h){
     outfile << print_outputs(h);
     outfile << ");" << std::endl;
     outfile << print_wires(h);
-    outfile << print_modules(h);
-//    outfile << print_states(h);
+    outfile << print_vars(h);
+    outfile << print_state_def(h);
+//    outfile << print_modules(h);
+//    outfile << print_assignment(h);
+    outfile << print_states(h);
     outfile << "\nendmodule\n" << std::endl;
     outfile << footer;
+}
+std::string print_state_def(Hlsm * h){
+    int size = h->states.size();
+    int bits = static_cast<int>(std::log2(size))+1;
+    std::string out = "\treg [" + std::to_string(bits-1) + ":0] state;\n";
+    for(int i=0;i<size;++i){
+        out += "\tlocalparam " + h->states[i]->name + " = ";
+        out += std::to_string(bits) + "'d" + std::to_string(i) + ";\n";
+    }
+    return out;
+}
+std::string print_states(Hlsm * h){
+    std::string out = "\talways @(posedge Clk) begin\n";
+    out += "\t\tcase (state)\n";
+    for(int i=0;i<h->states.size();++i){
+        state_t * state = h->states[i];
+        out += "\t\t\t" + state->name + ": begin\n";
+        out += state->body;
+        if(state->condition=="true"){
+            out += "\t\t\t\tstate <= ";
+            if(state->true_state!=NULL) out += state->true_state->name; //FIXME Segfault
+            out += ";\n";
+        } else {
+            out += "\t\t\t\tif (" +  state->condition + ") state <=";
+            if(state->true_state!=NULL) out += state->true_state->name; //FIXME Segfault
+            out += ";\n";
+            if(state->else_state != NULL) {
+                out += "\t\t\t\telse state <= ";
+                out += state->else_state->name;
+                out += ";\n";
+            }
+        }
+        out += "\t\t\tend\n";
+    }
+    out += "\t\tendcase\n";
+    out += "\tend\n";
+    return out;
 }
 std::string parse_module_name(std::string filename){
     std::regex path_regex("^\\.?.*?(.*?)\\..*$",
@@ -33,6 +75,41 @@ std::string parse_module_name(std::string filename){
 
     return matches[1];
 }
+std::string print_vars(Hlsm *h){
+    std::string out;
+    for(int i=0;i<h->graph.edges.size();++i){
+        edge_t * edge = h->graph.edges[i];
+        if(edge->type == VAR && !edge->is_copy){
+            out = out +"\treg ";
+            if(edge->width > 1){
+                if(edge->is_signed) out += "signed";
+                out += "[" + std::to_string(edge->width - 1);
+                out += ":0] " + edge->name + ";\n";
+            } else {
+                out += edge->name;
+                out+= ";\n";
+            }
+        }
+    }
+    return out;
+}
+std::string print_assignment(Hlsm *h){
+    std::string out;
+    out = "\talways @(posedge Clk) begin\n";
+    for(int i=0;i<h->graph.nodes.size();++i){
+        node_t * node = h->graph.nodes[i];
+        if(node->type == VAR){
+            out += "\t\t";
+            out += node->output->name;
+            out += "<=";
+            out += node->input_1->name;
+            out += ";\n";
+        }
+    }
+    out += "\tend\n";
+    return out;
+}
+
 std::string print_wires(Hlsm *h){
     std::string out;
     for(int i=0;i<h->graph.edges.size();++i){

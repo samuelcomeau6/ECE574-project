@@ -1,11 +1,12 @@
 #include <string>
 #include <vector>
+#include <cfloat>
 
 #ifndef GRAPH_H
 #define GRAPH_H
 
 enum comp_type {ERR, REG, ADD, SUB, MUL, COMPLT, COMPEQ, COMPGT, COMPLTE, COMPGTE,
-         MUX2X1, SHR, SHL, DIV, MOD, INC, DEC, INPUT, OUTPUT, WIRE, VAR};
+         MUX2X1, SHR, SHL, DIV, MOD, INC, DEC, INPUT, OUTPUT, WIRE, VAR, IF, THEN, ELSE};
 typedef enum comp_type comp_t;
 struct edge_struct{
     std::string name;
@@ -24,9 +25,10 @@ typedef struct edge_struct edge_t;
 struct node_struct{
     std::string name;
 	struct edge_struct *  input_1;
-	struct edge_struct  *  input_2;
-	struct edge_struct  *  select;
-	struct edge_struct  *  output;
+	struct edge_struct *  input_2;
+	struct edge_struct *  select;
+	struct edge_struct *  output;
+	struct edge_srtuct * output_2;
 	comp_t type;
 	bool is_signed;
 	int width;
@@ -50,8 +52,10 @@ class Graph{
     	std::vector<edge_t *> edges;
         Graph();
     	Graph(const Graph &g);
-        void add_node(comp_t component_type, std::string input1_name, std::string input2_name, std::string select, std::string output_name);
-        void add_edge(comp_t component_type, std::string name, int data_width, bool is_signed);
+        node_t * add_node(comp_t component_type, std::string input1_name, std::string input2_name, std::string select, std::string output_name);
+        node_t * add_if(std::string cond);
+        edge_t * add_edge(comp_t component_type, std::string name, int data_width, bool is_signed);
+        edge_t * add_edge(comp_t component_type, std::string name, node_t * from, node_t* to, int data_width, bool is_signed);
         edge_t * copy_edge(edge_t edge);
         std::string graph_toString();
         std::string scheduled_graph_toString();
