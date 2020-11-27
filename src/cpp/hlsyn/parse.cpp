@@ -114,17 +114,17 @@ std::string parse_line(string line, Graph * list){
    if(boost::regex_search(start, end, matches, noop_regex, flags)){
         add_assignment(matches[1], matches[2], list);
    }
-   boost::regex if_regex("\\s*if\\s*\\(\\s*(\\w+)\\s*\\)\\s*{");
+   boost::regex if_regex("\\s*if\\s*\\(\\s*(\\w+)\\s*\\)\\s*\\{");
    if(boost::regex_search(start, end, matches, if_regex, flags)){
         in_if.push(add_if(matches[1], list));
         is_else.push(false);
    }
-   boost::regex end_if_regex("}");
+   boost::regex end_if_regex("\\}");
    if(boost::regex_search(start, end, matches, end_if_regex, flags)){
         in_if.pop();
         is_else.pop();
    }
-   boost::regex else_regex("$\\s*else\\s*{");
+   boost::regex else_regex("$\\s*else\\s*\\{");
    if(boost::regex_search(start, end, matches, else_regex, flags)){
         in_if.push(add_if(matches[1], list));
         is_else.push(true);
