@@ -286,6 +286,7 @@ std::string Graph::scheduled_graph_toString(void){
         }
         out = out + "}\n";
     }
+    out = out + "\n{rank = same; "+ std::to_string(this->onop.start_time) + "; onop;}\n";
     out = out + "}\n";
     out = out + "/" + "/" + std::to_string(this->edges.size()) + "edges\n";
     out = out + "/" + "/" + std::to_string(this->nodes.size()) + "nodes\n";

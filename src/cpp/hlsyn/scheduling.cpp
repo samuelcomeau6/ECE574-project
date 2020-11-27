@@ -115,7 +115,7 @@ void compute_forces(Graph * graph, int end){
     for(int j=0;j<graph->nodes.size();++j){
         node_t * node = graph->nodes[j];
         for(int t=node->interval[0];t<=node->interval[1];++t){
-            node->total_force[t] = node->self_force[t] - get_pred_force(node, t) - get_suc_force(graph, node, t);
+            node->total_force[t] = node->self_force[t] + get_pred_force(node, t) + get_suc_force(graph, node, t);//FIXME
         }
     }
     #ifdef DEBUG
@@ -186,9 +186,9 @@ void alap(Graph * graph,int latency){
         unscheduled_nodes = false;
         for(int i=0;i<graph->nodes.size();++i){
             if(graph->nodes[i]->color!="scheduled"){
-                unscheduled_nodes=true;//FIXME only basing scheduablility off of the outputs
+                unscheduled_nodes=true;
                 if(alap_schedulable(graph, i, t)){
-                    #ifdef DEBUG
+                    #ifdef DEBUG3
                         printf("%s is alap @ %d\n",graph->nodes[i]->name.c_str(),t);
                     #endif
                     graph->nodes[i]->start_time = t;
