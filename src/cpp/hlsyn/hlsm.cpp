@@ -36,7 +36,7 @@ void Hlsm::generate_states(){
         name = "T" + std::to_string(t) + "i" + std::to_string(index);
         logic = "";
         cond = "true";
-        for(int i=0;i<this->graph.nodes.size();++i){//TODO bad complexity
+        for(int i=0;i<this->graph.nodes.size();++i){
             node_t * node = this->graph.nodes[i];
             if(node->start_time == t){
                 if(node->type == MUX2X1){

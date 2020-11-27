@@ -14,7 +14,7 @@ int main(int argc, char * argv[]){
         exit(EXIT_FAILURE);
     }
     std::string input_filename(argv[1]);
-    int latency = atoi(argv[2]); //TODO error checking
+    int latency = std::stoi(argv[2]);
     std::string output_filename(argv[3]);
     Graph g;
     g.inop.name = "inop";

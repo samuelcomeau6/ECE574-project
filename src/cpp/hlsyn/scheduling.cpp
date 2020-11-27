@@ -115,7 +115,7 @@ void compute_forces(Graph * graph, int end){
     for(int j=0;j<graph->nodes.size();++j){
         node_t * node = graph->nodes[j];
         for(int t=node->interval[0];t<=node->interval[1];++t){
-            node->total_force[t] = node->self_force[t] + get_pred_force(node, t) + get_suc_force(graph, node, t);//FIXME
+            node->total_force[t] = node->self_force[t] + get_pred_force(node, t) + get_suc_force(graph, node, t);
         }
     }
     #ifdef DEBUG
@@ -218,8 +218,6 @@ void asap(Graph * graph){
         ++t;
     }
     graph->onop.start_time=t;
-    std::ofstream asap("asap.txt", std::ios::app);
-    asap << graph->scheduled_graph_toString();
 }
 bool is_schedulable(node_t * node, int t){
     bool input_1_ok=false;
@@ -267,7 +265,7 @@ bool schedule_min_force(Graph * graph, int end){
     float min_force = FLT_MAX;
     for(int i=0;i<graph->nodes.size();++i){
         for(int t=graph->nodes[i]->interval[0];t<=graph->nodes[i]->interval[1];++t){
-            if(graph->nodes[i]->total_force[t] < min_force && graph->nodes[i]->color!="scheduled"){ //TODO and is schedulable!!
+            if(graph->nodes[i]->total_force[t] < min_force && graph->nodes[i]->color!="scheduled"){
                 min_index = i;
                 min_time = t;
                 min_force = graph->nodes[i]->total_force[t];

@@ -143,7 +143,6 @@ void close(ifstream * file){
     implements other functions to return a completed netlist type
 */
 void parse(std::string filename, Graph * list){
-    //TODO get a HLSM instead of a graph and add states for ifs?
     ifstream netlist(filename, std::ios::in);
     if(!netlist.is_open()){
         perror("Could not open input file");
