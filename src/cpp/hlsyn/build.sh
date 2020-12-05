@@ -1,13 +1,14 @@
 #!/bin/bash
-if [ -z "$1" ]
-then
-    buildtype=DEBUG
-else
-    buildtype=$@
-fi
-mkdir -p build
-cmake -DCMAKE_BUILD_TYPE=$buildtype . -Bbuild
-make -C./build/
+set -e
+rm -f ./hlsynd
+rm -f ./hlsynr
+mkdir -p build/debug
+mkdir -p build/release
+cmake -DCMAKE_BUILD_TYPE=DEBUG . -Bbuild/debug
+cmake -DCMAKE_BUILD_TYPE=RELEASE . -Bbuild/release
+make -C./build/debug
+make -C./build/release
 success=$?
-cp ./build/hlsyn .
+cp ./build/debug/hlsyn ./hlsynd
+cp ./build/release/hlsyn ./hlsynr
 exit $success

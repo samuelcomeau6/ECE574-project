@@ -40,11 +40,11 @@ void Hlsm::generate_states(){
             node_t * node = this->graph.nodes[i];
             if(node->start_time == t){
                 if(node->type == MUX2X1){
-                    logic += "\t\t\t\t" + node->output->name + "<=" + node->select->name + " ? ";
+                    logic += "\t\t\t\t" + node->output->name + " <= " + node->select->name + " ? ";
                     logic += node->input_1->name + " : " + node->input_2->name + ";\n";
                 } else {
-                    logic += "\t\t\t\t" + node->output->name + "<=";
-                    logic += node->input_1->name + comp_to_op(node->type) + node->input_2->name  + ";\n";
+                    logic += "\t\t\t\t" + node->output->name + " <= ";
+                    logic += node->input_1->name + " " + comp_to_op(node->type) + " " + node->input_2->name  + ";\n";
                 }
             }
         }

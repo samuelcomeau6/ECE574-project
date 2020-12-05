@@ -1,5 +1,6 @@
 #include "graph.h"
 #include "scheduling.h"
+#include <cassert>
 #include <iostream>
 #include <fstream>
 void fds(Graph * graph, int latency){
@@ -35,26 +36,33 @@ void compute_timeframe(Graph * graph, int latency){
     }
     #ifdef DEBUG
         for(int i=0;i<graph->nodes.size();++i){
-            std::cout << "node " << i << " :"  << graph->nodes[i]->name;
+            std::cout << "node " << i << ": "  << graph->nodes[i]->name;
             std::cout << " interval:[" << graph->nodes[i]->interval[0] << "," << graph->nodes[i]->interval[1] << "]" << std::endl;
         }
     #endif
 
 }
+
 void compute_probability(Graph * graph, int end){
     for(int i=0;i<graph->nodes.size();++i){
         node_t * node = graph->nodes[i];
         node->prb.resize(end+1);
-        for(int t=0;t<=end;++t){
-            //if t is outside time frame prb=0
-            if(t<node->interval[0] || t>node->interval[1]){
-                node->prb[t] = 0.0;
+        for(int j=0;j<=end;++j){
+            node->prb[j]=0; //Initialize but can't do in next step because additive
+        }
+        for(int j=0;j<=end;++j){
+            //if j is outside time frame prb=0
+            if(j<node->interval[0] || j>node->interval[1]){
+                continue;
             }
-            //else prb=1/(width timeframe)
+            //else prb=1/(width timeframe) through duration
             else {
                 int width=node->interval[1] - node->interval[0] + 1;
-                if(width!=0) node->prb[t] = 1.0/width;
-                else node->prb[t] = 0.0;
+                if(width!=0){
+                    for(int l=0;l<node->duration;++l){
+                        node->prb[j+l] += 1.0/width;
+                    }
+                }
             }
         }
     }
@@ -63,16 +71,29 @@ void compute_type_dist(Graph * graph, int end){
     graph->q.resize(5);
     for(int i=0;i<graph->q.size();++i){
         graph->q[i].resize(end+1);
+        for(int j=0;j<end+1;++j){
+            graph->q[i][j] = 0;
+        }
     }
     //for each node, v
     for(int i=0;i<graph->nodes.size();++i){
         node_t * node = graph->nodes[i];
         //if type=k qk(t)=qk(t)+v.prb(t)
-        for(int t=0;t<end;++t){
+        for(int t=0;t<=end;++t){
             int k = get_bin(node->type);
             graph->q[k][t] = graph->q[k][t] + node->prb[t];
         }
     }
+    #ifdef DEBUG
+        printf("TypeDistr:\n");
+        for(int k=0;k<graph->q.size();++k){
+            printf("[k=%d]:",k);
+            for(int t=1;t<=end;++t){
+                printf("[t=%d]:%.2f",t,graph->q[k][t]);
+            }
+            printf("\n");
+        }
+    #endif
 }
 int get_bin(comp_t type){
     int k=0;
@@ -95,34 +116,45 @@ int get_bin(comp_t type){
     return k;
 }
 void compute_forces(Graph * graph, int end){
-    for(int j=0;j<graph->nodes.size();++j){
-        node_t * node = graph->nodes[j];
+    for(int i=0;i<graph->nodes.size();++i){
+        node_t * node = graph->nodes[i];
         node->self_force.resize(end+1);
         node->total_force.resize(end+1);
-        for(int t=node->interval[0];t<=node->interval[1];++t){
-            //v.selfforce = sigma( v.force(i), intervalStart, intervalEnd)
-            for(int i=node->interval[0];i<=node->interval[1];++i){
-                //x(i)=kdelta(i-t)-v.prob
-                float kdelta = (i==t)?1.0:0.0;
-                float x = (kdelta - node->prb[t]);
-                //v.force(i)=qk(t)*x(i)
-                node->self_force[t] = node->self_force[t] + graph->q[get_bin(node->type)][i]*x;
+        for(int j=node->interval[0];j<=node->interval[1];++j){
+            node->self_force[j]=0;
+            //v.selfforce = sigma( v.force(l), intervalStart, intervalEnd + duration)
+            for(int l=node->interval[0];l<=node->interval[1]+node->duration;++l){
+                //x(l)=window[j,t+duration](l)-v.prob(l)
+                float kdelta = 0.0;
+                if(l>=j && l < j + node->duration) kdelta = 1.0;
+                float x = (kdelta - node->prb[l]);
+                //v.force(l)=qk(j)*x(l)
+                #ifdef DEBUG3
+                    printf("\tself_force%d[j%d][l%d] = %.2f + %.2f * (%.2f - %.2f) = ",
+                           l,j,l,node->self_force[j],graph->q[get_bin(node->type)][l],kdelta,node->prb[l]);
+                #endif
+                node->self_force[j] += graph->q[get_bin(node->type)][l]*x;
+                #ifdef DEBUG3
+                    printf("%.2f\n",node->self_force[j]);
+                #endif
             }
         }
     }
-    //pred_suc force = sum of forces of implictly scheduled
+    //pred_suc force = sum of forces of ALL implictly scheduled
     //total forces=self_force+pred_suc force
-    for(int j=0;j<graph->nodes.size();++j){
-        node_t * node = graph->nodes[j];
+    for(int i=0;i<graph->nodes.size();++i){
+        node_t * node = graph->nodes[i];
         for(int t=node->interval[0];t<=node->interval[1];++t){
-            node->total_force[t] = node->self_force[t] + get_pred_force(node, t) + get_suc_force(graph, node, t);
+            node->total_force[t] = node->self_force[t] + get_predsuc_force(graph, node, t);
         }
     }
     #ifdef DEBUG
         for(int i=0;i<graph->nodes.size();++i){
-            std::cout << "node " << i << " :"  << graph->nodes[i]->name << " ";
+            std::cout << "node " << i << ": "  << graph->nodes[i]->name << " ";
             for(int t=graph->nodes[i]->interval[0];t<=graph->nodes[i]->interval[1];++t){
-                std::cout <<"@"<< t<<":" << graph->nodes[i]->self_force[t] << "," << graph->nodes[i]->total_force[t] << " ";
+                std::cout <<"@"<< t<<":" << graph->nodes[i]->self_force[t] << "+"
+                          << get_predsuc_force(graph, graph->nodes[i], t) << "="
+                          << graph->nodes[i]->total_force[t] << " ";
             }
             std::cout << std::endl;
         }
@@ -130,49 +162,56 @@ void compute_forces(Graph * graph, int end){
 
 }
 
-float get_pred_force(node_t * node, int t){
-    float pred_force=0.0;
-    if(node->input_1->from->name=="inop") return 0;
-    if(node->input_2->from->name=="inop") return 0;
-    if(t<=node->input_1->from->interval[1]){
-        //In the interval for input1
-        pred_force+=node->input_1->from->self_force[t];
+float get_predsuc_force(Graph * graph, node_t * node, int t){
+    float ps_force = 0.0;
+    if(node->name == "onop" || node->name == "inop" || t<=0){
+        return 0.0;
     }
-    if(t<=node->input_2->from->interval[1]){
-        //In the interval for input2
-        pred_force+=node->input_2->from->self_force[t];
-    }
-    if(node->type == MUX2X1 && t < node->select->from->interval[1]){
-        //In the interval for select
-        pred_force+=node->select->from->self_force[t];
-    }
-    return pred_force;
-}
-float get_suc_force(Graph * graph, node_t * node, int t){
-    float suc_force = 0.0;
     for(int i=0;i<graph->nodes.size();++i){
-        if(graph->nodes[i]->type != MUX2X1){ //Since select = Null if not mux, checking name will cause segfault
-            if(graph->nodes[i]->input_1->name == node->output->name || graph->nodes[i]->input_2->name == node->output->name){
-                //Node[i] is a successor of node
-                if(t>=graph->nodes[i]->interval[0]){
-                    //in the interval
-                    suc_force+=graph->nodes[i]->self_force[t];
+        node_t * ps_node = graph->nodes[i];
+        bool is_pred = false;
+        bool is_succ = false;
+        //Test if sucessor
+        is_succ = (is_succ
+                   || ps_node->input_1->name == node->output->name
+                   || ps_node->input_2->name == node->output->name);
+        if(ps_node->type == MUX2X1){ //Since select = Null if not mux, checking name will cause segfault
+            is_succ = (is_succ || ps_node->select->name == node->output->name);
+        }
+        //Test is predessor
+        is_pred = (is_pred
+                    || ps_node->name == node->input_1->from->name
+                    || ps_node->name == node->input_2->from->name);
+        if(node->type == MUX2X1){
+            is_pred = (is_pred || ps_node->name == node->select->from->name);
+        }
+        assert(!(is_pred && is_succ));
+        float sum1=0;
+        float sum2=0;
+        if(is_pred || is_succ){
+            int ts=ps_node->interval[0];
+            int tl=ps_node->interval[1];
+            if(is_pred && t < tl) tl = t;
+            if(is_succ && t > ts) ts = t;
+            std::vector<float> mod_prob;
+            mod_prob.resize(tl+ps_node->duration+1);
+            for(int j=0;j<tl;++j){
+                for(int l=0;l<node->duration;++l){
+                    if(ts<=j && j<=tl) mod_prob[j+l] += 1.0/(tl-ts+1);
                 }
             }
-        }
-        else {
-            if(graph->nodes[i]->input_1->name == node->output->name || graph->nodes[i]->input_2->name == node->output->name || graph->nodes[i]->select->name == node->output->name){
-                //Node[i] is a successor of node
-                if(t>=graph->nodes[i]->interval[0]){
-                    //in the interval
-                    suc_force+=graph->nodes[i]->self_force[t];
-                }
+            for(int l=ts;l<=tl+ps_node->duration;++l){
+                sum1 += graph->q[get_bin(ps_node->type)][l]*mod_prob[l];
+            }
+            for(int l=ps_node->interval[0]; l<=ps_node->interval[1]+ps_node->duration;++l){
+                sum2 += graph->q[get_bin(ps_node->type)][l]*ps_node->prb[l];
             }
         }
-
+        ps_force += (sum1 - sum2);
     }
-    return suc_force;
+    return ps_force;
 }
+
 void alap(Graph * graph,int latency){
     graph->onop.start_time=latency+1;
     graph->onop.color="scheduled";

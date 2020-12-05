@@ -1,1 +1,1 @@
-iverilog -I../../verilog/modules/ ./newtest/$1 -o${1%.v}
+iverilog -I../../verilog/modules/ ./newtest/$1 -o./newtest/${1%.v}

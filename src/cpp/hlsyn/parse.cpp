@@ -116,6 +116,8 @@ std::string parse_line(string line, Graph * list){
    }
    boost::regex if_regex("\\s*if\\s*\\(\\s*(\\w+)\\s*\\)\\s*\\{");
    if(boost::regex_search(start, end, matches, if_regex, flags)){
+        fprintf(stderr,"I didn't implement this, it seemed hard\n");
+        exit(EXIT_FAILURE);
         in_if.push(add_if(matches[1], list));
         is_else.push(false);
    }
