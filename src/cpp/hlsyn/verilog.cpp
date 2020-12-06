@@ -49,11 +49,11 @@ std::string print_states(Hlsm * h){
         out += state->body;
         if(state->condition=="true"){
             out += "\t\t\t\tstate <= ";
-            if(state->true_state!=NULL) out += state->true_state->name; //FIXME Segfault
+            if(state->true_state!=NULL) out += state->true_state->name;
             out += ";\n";
         } else {
             out += "\t\t\t\tif (" +  state->condition + ") state <=";
-            if(state->true_state!=NULL) out += state->true_state->name; //FIXME Segfault
+            if(state->true_state!=NULL) out += state->true_state->name;
             out += ";\n";
             if(state->else_state != NULL) {
                 out += "\t\t\t\telse state <= ";
@@ -150,7 +150,7 @@ std::string print_outputs(Hlsm * h){
     std::string out;
     for(int i=0;i<h->graph.edges.size();++i){
         edge_t * edge = h->graph.edges[i];
-        if(edge->type == OUTPUT){
+        if(edge->type == OUTPUT && !edge->is_copy){
             out = out + "\toutput reg ";
             if(edge->width > 1){
                 if(edge->is_signed) out = out + "signed ";

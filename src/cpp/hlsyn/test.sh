@@ -53,24 +53,27 @@ for i in {1..6};do
 done
 for i in {1..4};do
     l=${lat[$i+13]}
-    printf "Testing test_if$i.c $l......."
-    ./hlsynr ./newtest/test_if"$i".c $l ./newtest/test_if"$i".v >> $outfile
-    diff --suppress-common-lines -sy ./newtest/test_if"$i"out.v ./newtest/test_if"$i".v >> $outfile
-    if [ $? -eq 0 ]
+    if [ $i != 3 ]
     then
-        printf "Passed\n"
-    else
-        fail=1
-        printf "....FAILED!\n"
-    fi
-    printf "\tsimulating...\t\t"
-    ./sim.sh test_if"$i".v
-    if [ $? -eq 0 ]
-    then
-        printf "Passed\n"
-    else
-        fail=1
-        printf "....FAILED!\n"
+        printf "Testing test_if$i.c $l............"
+        ./hlsynr ./newtest/test_if"$i".c $l ./newtest/test_if"$i".v >> $outfile
+        diff --suppress-common-lines -sy ./newtest/test_if"$i"out.v ./newtest/test_if"$i".v >> $outfile
+        if [ $? -eq 0 ]
+        then
+            printf "Passed\n"
+        else
+            fail=1
+            printf "....FAILED!\n"
+        fi
+        printf "\tsimulating...\t\t"
+        ./sim.sh test_if"$i".v
+        if [ $? -eq 0 ]
+        then
+            printf "Passed\n"
+        else
+            fail=1
+            printf "....FAILED!\n"
+        fi
     fi
 done
 for i in {1..3};do
@@ -84,4 +87,14 @@ for i in {1..3};do
         printf "\t\t\t....FAILED!\n"
     fi
 done
+printf "Testing test_if3.c "
+./hlsynr ./newtest/test_if3.c 8 ./newtest/test_if3.v >> $outfile
+if [ $? -eq 1 ]
+then
+    printf "Passed\n"
+else
+    fail=1
+    printf "\t\t\t....FAILED!\n"
+fi
+
 exit $fail

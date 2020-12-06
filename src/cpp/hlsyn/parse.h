@@ -17,5 +17,5 @@ std::string parse_line(std::string line, Graph * list);
 void close(std::ifstream * file);
 /** @brief Calls get_line() and parse_line() to parse input file
 */
-void parse(std::string filename, Graph * list);
+void parse(std::string filename, Hlsm * h);
 #endif

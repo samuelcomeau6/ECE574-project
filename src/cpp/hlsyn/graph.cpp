@@ -40,7 +40,7 @@ Graph::Graph(const Graph &g){
         temp_obj->from = from_node;
         from_node->name = edge->from->name;
         node_t * to_node = NULL;
-        if(edge->to->name == "onop") {
+    if(edge->to->name == "onop") {
             to_node = &this->onop;
         } else {
             for(int j = 0; j < i; ++j){

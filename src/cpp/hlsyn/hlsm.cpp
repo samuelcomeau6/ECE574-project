@@ -22,6 +22,7 @@ void Hlsm::add_state(std::string state_name, int index, state_t * previous, std:
     this->states.push_back(temp_obj);
 }
 void Hlsm::generate_states(){
+    //Wait state
     std::string name = "WAIT";
     int index = 0;
     bool is_else = false;
@@ -30,6 +31,7 @@ void Hlsm::generate_states(){
     add_state(name, index, NULL, cond, logic, false);
     this->states.back()->else_state = this->states.back();
     int t=0;
+    //Generate time states
     while(t<this->graph.onop.start_time-1){
         ++t;
         index = this->states.size();
@@ -39,17 +41,29 @@ void Hlsm::generate_states(){
         for(int i=0;i<this->graph.nodes.size();++i){
             node_t * node = this->graph.nodes[i];
             if(node->start_time == t){
+                logic += "\t\t\t\t";
+                bool is_conditional_node = false;
+                for(cond_t c : this->conditions){
+                    for(node_t * n : c.then_members){
+                        if(n->name == node->name) logic += "if(" + c.condition + ") ";
+                    }
+                    for(node_t * n : c.else_members){
+                        if(n->name == node->name) logic += "if(~" + c.condition + ") ";
+                    }
+                }
                 if(node->type == MUX2X1){
-                    logic += "\t\t\t\t" + node->output->name + " <= " + node->select->name + " ? ";
+                    logic += node->output->name + " <= " + node->select->name + " ? ";
                     logic += node->input_1->name + " : " + node->input_2->name + ";\n";
                 } else {
-                    logic += "\t\t\t\t" + node->output->name + " <= ";
+                    logic += node->output->name + " <= ";
                     logic += node->input_1->name + " " + comp_to_op(node->type) + " " + node->input_2->name  + ";\n";
                 }
             }
         }
         add_state(name, index, this->states.back(), cond, logic, is_else);
     }
+    //Generate conditional states
+    //Final state
     index = this->states.size();
     name = "FINAL";
     cond = "true";

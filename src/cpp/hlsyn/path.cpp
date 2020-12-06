@@ -4,6 +4,7 @@
 #include "parse.h"
 #include "path.h"
 #include "graph.h"
+#include "hlsm.h"
 
 
 void add_data(comp_t component_type, std::string name, int data_width, bool is_signed, Graph * list){
@@ -16,14 +17,12 @@ void add_data(comp_t component_type, std::string name, int data_width, bool is_s
     #endif
 
 }
-node_t * add_if(std::string condition, Graph * list){
-    node_t * new_node = list->add_if(condition);
-    #ifdef DEBUG
-        std::cout << "IF: ";
-        std::cout << node_toString(*list->nodes[list->nodes.size()-1]) << std::endl;
-    #endif
-    return new_node;
-
+int add_if(std::string condition, Hlsm * sm){
+    cond_t * temp_obj = new cond_t;
+    temp_obj->name = "IF" + std::to_string(sm->conditions.size());
+    temp_obj->condition = condition;
+    sm->conditions.push_back(*temp_obj);
+    return sm->conditions.size()-1;
 }
 node_t * add_op(comp_t component_type, std::string input1_name, std::string input2_name, std::string output_name, Graph * list){
 

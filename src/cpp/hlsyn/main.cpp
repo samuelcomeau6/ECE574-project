@@ -17,22 +17,22 @@ int main(int argc, char * argv[]){
     int latency = std::stoi(argv[2]);
     std::string output_filename(argv[3]);
     Graph g;
-    g.inop.name = "inop";
-    g.onop.name = "onop";
-    parse(input_filename, &g);
-    Graph g_asap(g);
+    Hlsm h(&g);
+    h.graph.inop.name = "inop";
+    h.graph.onop.name = "onop";
+    parse(input_filename, &h);
+    Graph g_asap(h.graph);
     asap(&g_asap);
-    Graph g_alap(g);
+    Graph g_alap(h.graph);
     alap(&g_alap,latency);
-    fds(&g, latency);
+    fds(&h.graph, latency);
     if(output_filename == "-fds"){
-        std::cout << g.scheduled_graph_toString();
+        std::cout << h.graph.scheduled_graph_toString();
     } else if(output_filename == "-alap"){
         std::cout << g_alap.scheduled_graph_toString();
     } else if(output_filename == "-asap"){
         std::cout << g_asap.scheduled_graph_toString();
     } else {
-        Hlsm h(&g);
         print_verilog(output_filename, &h);
     }
 }

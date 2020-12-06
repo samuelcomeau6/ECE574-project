@@ -1,5 +1,6 @@
 #ifndef HLSM_H
 #define HLSM_H
+#include <vector>
 #include "graph.h"
 /** @file
 */
@@ -18,11 +19,27 @@ struct state_struct{
 /**
 */
 typedef struct state_struct state_t;
+/** @brief Conditional statement structure
+*/
+struct condition_struct{
+    std::string name;
+    std::string condition;
+    std::vector<node_t *> then_members;
+    std::vector<node_t *> else_members;
+};
+/**
+*/
+typedef struct condition_struct cond_t;
 /**
 */
 class Hlsm{
     public:
         Graph graph;
+        /**
+        */
+        std::vector<cond_t> conditions;
+        /**
+        */
         std::vector<state_t *> states;
         /** @brief Default constructor
             @param g - pointer to a graph object that will be copied into new Hlsm object

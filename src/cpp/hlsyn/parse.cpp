@@ -12,7 +12,8 @@ Created by Samuel Comeau
 #include <stdlib.h>
 #include "parse.h"
 #include "path.h"
-std::stack<node_t *> in_if;
+#include "hlsm.h"
+std::stack<int> in_if;
 std::stack<bool> is_else;
 using namespace std;
 #define TEN_WORD_REGEX "(?:,\\W+(\\w+))?(?:,\\W+(\\w+))?(?:,\\W+(\\w+))?"\
@@ -23,7 +24,8 @@ using namespace std;
 
 /* parse_line
 */
-std::string parse_line(string line, Graph * list){
+std::string parse_line(string line, Hlsm * h){
+    Graph * list = &h->graph;
     int data_width;
     bool data_signed=0;
     comp_t component=ERR;
@@ -93,13 +95,9 @@ std::string parse_line(string line, Graph * list){
                 node_t * new_node = add_op(component, matches[2], matches[4], matches[1], list);
                 if(!in_if.empty()){
                     if(!is_else.top()){
-                        std::string name = in_if.top()->name + "then";
-                        edge_t * new_edge = list->add_edge(THEN, name, in_if.top(), new_node, 0, false);
-                        if(in_if.top()->output == NULL) in_if.top()->output = new_edge;
+                        h->conditions[in_if.top()].then_members.push_back(new_node);
                     } else {
-                        std::string name = in_if.top()->name + "else";
-                        edge_t * new_edge = list->add_edge(ELSE, name, in_if.top(), new_node, 0, false);
-                        if(in_if.top()->output == NULL) in_if.top()->output = new_edge;
+                        h->conditions[in_if.top()].else_members.push_back(new_node);
                     }
                 }
             }
@@ -116,9 +114,9 @@ std::string parse_line(string line, Graph * list){
    }
    boost::regex if_regex("\\s*if\\s*\\(\\s*(\\w+)\\s*\\)\\s*\\{");
    if(boost::regex_search(start, end, matches, if_regex, flags)){
-        fprintf(stderr,"I didn't implement this, it seemed hard\n");
-        exit(EXIT_FAILURE);
-        in_if.push(add_if(matches[1], list));
+        //fprintf(stderr,"I didn't implement this, it seemed hard\n");
+        //exit(EXIT_FAILURE);
+        in_if.push(add_if(matches[1], h));
         is_else.push(false);
    }
    boost::regex end_if_regex("\\}");
@@ -126,9 +124,9 @@ std::string parse_line(string line, Graph * list){
         in_if.pop();
         is_else.pop();
    }
-   boost::regex else_regex("$\\s*else\\s*\\{");
+   boost::regex else_regex("\\s*else\\s*\\{");
    if(boost::regex_search(start, end, matches, else_regex, flags)){
-        in_if.push(add_if(matches[1], list));
+        in_if.push(h->conditions.size()-1);
         is_else.push(true);
    }
    return line;
@@ -144,7 +142,7 @@ void close(ifstream * file){
 /* parse
     implements other functions to return a completed netlist type
 */
-void parse(std::string filename, Graph * list){
+void parse(std::string filename, Hlsm * h){
     ifstream netlist(filename, std::ios::in);
     if(!netlist.is_open()){
         perror("Could not open input file");
@@ -156,14 +154,18 @@ void parse(std::string filename, Graph * list){
     while(!netlist.eof()){
         std::string nextline;
         getline(netlist, nextline);
-        out = parse_line(nextline, list);
+        out = parse_line(nextline, h);
         #ifdef DEBUG
             std::cout << out << std::endl;
         #endif
     };
-    if(list->nodes.size()==0){
+    if(h->graph.nodes.size()==0){
         fprintf(stderr,"ERROR:Could not parse any nodes.\n");
         exit(EXIT_FAILURE);
     }
     close(&netlist);
+    //Close any unterminated edges
+    for(edge_t * edge : h->graph.edges){
+        if(edge->to == NULL) edge->to = &h->graph.onop;
+    }
 }
