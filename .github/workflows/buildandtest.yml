@@ -12,7 +12,10 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
+  env:
+    BOOST_ROOT: ${{github.workspace}}/3rdparty/boost
+    BOOST_URL: https://sourceforge.net/projects/boost/files/boost/1.72.0/boost_1_72_0.tar.bz2/download
+    
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
