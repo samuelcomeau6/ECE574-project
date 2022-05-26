@@ -24,7 +24,28 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+      - name: Restore Boost cache
+        uses: actions/cache@v2.1.6
+        id: cache-boost
+        with:
+          path: ${{env.BOOST_ROOT}}
+          key: boost
 
+      - name: Install Boost
+        if: steps.cache-boost.outputs.cache-hit != 'true'
+        run: |
+          if [ "$OS" == "Windows_NT" ]; then
+            # fix up paths to be forward slashes consistently
+            BOOST_ROOT=$(echo $BOOST_ROOT | sed 's/\\/\//g')
+          fi
+          mkdir -p $BOOST_ROOT
+          curl --progress-bar --location --output $BOOST_ROOT/download.tar.bz2 $BOOST_URL
+          7z -o$BOOST_ROOT x $BOOST_ROOT/download.tar.bz2 -y -bd
+          7z -o$BOOST_ROOT x $BOOST_ROOT/download.tar -y -bd
+          cd $BOOST_ROOT && cp -r boost_*/* .
+          rm -rf boost_*/* download.tar.bz2 download.tar
+        shell: bash
+        
       # Runs a set of commands using the runners shell
       - name: Build
         run: |
